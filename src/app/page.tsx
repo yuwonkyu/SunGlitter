@@ -1,6 +1,6 @@
-import Link from "next/link";
+import LinkCard, { type LinkItem } from "@/components/ui/LinkCard";
 
-const links = [
+const LINKS: LinkItem[] = [
   {
     title: "예약 링크 (신청하기)",
     subtitle: "준비중",
@@ -30,8 +30,8 @@ export default function Home() {
   return (
     <div className="paper-bg min-h-screen px-5 py-8">
       <main className="mx-auto w-full max-w-md">
-        <section className="fade-up rounded-2xl border border-[var(--line)] bg-[var(--card)] p-6 shadow-[0_8px_24px_rgba(0,0,0,0.07)]">
-          <p className="text-xs tracking-[0.3em] text-[var(--muted)]">
+        <section className="fade-up rounded-2xl border border-(--line) bg-(--card) p-6 shadow-[0_8px_24px_rgba(0,0,0,0.07)]">
+          <p className="text-xs tracking-[0.3em] text-(--muted)">
             YOONSEUL HOUSE
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground">
@@ -39,59 +39,18 @@ export default function Home() {
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-(--muted)">
             제주 구좌읍 월정리에 있는 감성 스튜디오입니다. 아래 링크에서 예약 및
-            채널을 확인해 주세요.
+            스케쥴을 확인해 주세요.
           </p>
         </section>
 
         <section className="mt-5 space-y-3">
-          {links.map((item, index) => {
-            const baseClass =
-              "card-in block rounded-xl border border-[var(--line)] bg-[var(--card)] p-4 shadow-[0_5px_14px_rgba(0,0,0,0.05)] transition hover:-translate-y-0.5";
-            const style = {
-              animationDelay: `${index * 80}ms`,
-            } as const;
-
-            if (item.disabled) {
-              return (
-                <div
-                  key={item.title}
-                  className={`${baseClass} cursor-not-allowed opacity-70`}
-                  style={style}
-                >
-                  <p className="text-sm font-semibold">{item.title}</p>
-                  <p className="mt-1 text-xs text-(--muted)">{item.subtitle}</p>
-                </div>
-              );
-            }
-
-            if (item.external) {
-              return (
-                <a
-                  key={item.title}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={baseClass}
-                  style={style}
-                >
-                  <p className="text-sm font-semibold">{item.title}</p>
-                  <p className="mt-1 text-xs text-(--muted)">{item.subtitle}</p>
-                </a>
-              );
-            }
-
-            return (
-              <Link
-                key={item.title}
-                href={item.href}
-                className={baseClass}
-                style={style}
-              >
-                <p className="text-sm font-semibold">{item.title}</p>
-                <p className="mt-1 text-xs text-(--muted)">{item.subtitle}</p>
-              </Link>
-            );
-          })}
+          {LINKS.map((item, index) => (
+            <LinkCard
+              key={item.title}
+              item={item}
+              animationDelay={index * 80}
+            />
+          ))}
         </section>
       </main>
     </div>
