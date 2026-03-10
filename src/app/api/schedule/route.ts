@@ -8,6 +8,10 @@ const isValidStatus = (status: string): status is ReservationStatus => {
   return ["available", "pending", "booked"].includes(status);
 };
 
+const isValidHalfHourTime = (time: string) => {
+  return /^([01]\d|2[0-3]):(00|30)$/.test(time);
+};
+
 const unauthorized = () =>
   NextResponse.json(
     { message: "관리자 로그인 후 이용 가능합니다." },
@@ -35,6 +39,13 @@ export async function POST(request: Request) {
   ) {
     return NextResponse.json(
       { message: "필수 값이 누락되었습니다." },
+      { status: 400 },
+    );
+  }
+
+  if (!isValidHalfHourTime(body.time)) {
+    return NextResponse.json(
+      { message: "예약 시간은 30분 단위로만 입력할 수 있습니다." },
       { status: 400 },
     );
   }
@@ -83,6 +94,13 @@ export async function PUT(request: Request) {
   if (body.status && !isValidStatus(body.status)) {
     return NextResponse.json(
       { message: "상태 값이 유효하지 않습니다." },
+      { status: 400 },
+    );
+  }
+
+  if (body.time && !isValidHalfHourTime(body.time)) {
+    return NextResponse.json(
+      { message: "예약 시간은 30분 단위로만 입력할 수 있습니다." },
       { status: 400 },
     );
   }

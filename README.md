@@ -14,7 +14,8 @@
 
 - / : 링크 허브 홈
 - /schedule : 예약현황 보기
-- /admin : 관리자 예약현황 등록/수정/삭제
+- /**\*\***\***\*\***-**\***-\*\*\* : 관리자 예약현황 등록/수정/삭제
+- /admin : 접근 시 404 (숨김 처리)
 
 ## 로컬 실행
 
@@ -26,7 +27,7 @@ npm install
 
 2. 환경변수 설정
 
-프로젝트 루트에 .env.local 파일을 만들고 .env.example 내용을 복사해 값 입력
+프로젝트 루트에 .env.local 파일을 만들고 .env 내용을 복사해 값 입력
 
 3. 개발 서버
 
@@ -40,6 +41,8 @@ npm run dev
 - ADMIN_SESSION_SECRET: 관리자 세션 서명 키
 - UPSTASH_REDIS_REST_URL: Upstash Redis URL
 - UPSTASH_REDIS_REST_TOKEN: Upstash Redis Token
+- GATE_USER: 관리자 경로 Basic Auth 아이디 (기본값: admin)
+- GATE_PASSWORD: 관리자 경로 Basic Auth 비밀번호 (필수 설정)
 
 참고: Redis 환경변수가 없으면 로컬 메모리 저장으로 동작하며 서버 재시작 시 데이터가 사라집니다.
 
@@ -53,6 +56,6 @@ npm run dev
 
 구현되어 있습니다.
 
-- /admin 로그인 성공 시 HttpOnly 쿠키 세션 발급
+- /yoonseulhouse-admin-jhj 로그인 성공 시 HttpOnly 쿠키 세션 발급
 - /api/schedule의 POST/PUT/DELETE는 관리자 세션이 없으면 401 반환
 - 일반 사용자는 /schedule에서 조회만 가능

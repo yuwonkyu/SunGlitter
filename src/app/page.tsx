@@ -34,10 +34,10 @@ export default function Home() {
           <p className="text-xs tracking-[0.3em] text-[var(--muted)]">
             YOONSEUL HOUSE
           </p>
-          <h1 className="mt-2 text-2xl font-bold text-[var(--foreground)]">
+          <h1 className="mt-2 text-2xl font-bold text-foreground">
             윤슬이네 스튜디오
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">
+          <p className="mt-3 text-sm leading-relaxed text-(--muted)">
             제주 구좌읍 월정리에 있는 감성 스튜디오입니다. 아래 링크에서 예약 및
             채널을 확인해 주세요.
           </p>
@@ -59,9 +59,7 @@ export default function Home() {
                   style={style}
                 >
                   <p className="text-sm font-semibold">{item.title}</p>
-                  <p className="mt-1 text-xs text-[var(--muted)]">
-                    {item.subtitle}
-                  </p>
+                  <p className="mt-1 text-xs text-(--muted)">{item.subtitle}</p>
                 </div>
               );
             }
@@ -77,9 +75,7 @@ export default function Home() {
                   style={style}
                 >
                   <p className="text-sm font-semibold">{item.title}</p>
-                  <p className="mt-1 text-xs text-[var(--muted)]">
-                    {item.subtitle}
-                  </p>
+                  <p className="mt-1 text-xs text-(--muted)">{item.subtitle}</p>
                 </a>
               );
             }
@@ -92,19 +88,11 @@ export default function Home() {
                 style={style}
               >
                 <p className="text-sm font-semibold">{item.title}</p>
-                <p className="mt-1 text-xs text-[var(--muted)]">
-                  {item.subtitle}
-                </p>
+                <p className="mt-1 text-xs text-(--muted)">{item.subtitle}</p>
               </Link>
             );
           })}
         </section>
-
-        <div className="mt-6 text-center text-xs text-[var(--muted)]">
-          <Link href="/admin" className="underline underline-offset-4">
-            관리자 예약현황 편집
-          </Link>
-        </div>
       </main>
     </div>
   );
