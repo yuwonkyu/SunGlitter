@@ -27,20 +27,20 @@ export const metadata: Metadata = {
     description:
       "제주 구좌읍 월정리의 감성 스튜디오, 윤슬이네 스튜디오입니다. 예약 및 일정 확인은 아래 링크를 이용해 주세요.",
     images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "윤슬이네 스튜디오",
-      },
-    ],
+  {
+    url: "https://sun-glitter.vercel.app/og-image.png",
+    width: 1200,
+    height: 630,
+    alt: "윤슬이네 스튜디오",
+  },
+],
   },
 
   twitter: {
     card: "summary_large_image",
     title: "윤슬이네 스튜디오",
     description: "제주 구좌읍 월정리의 감성 스튜디오, 윤슬이네 스튜디오입니다.",
-    images: ["/og-image.png"],
+    images: ["https://sun-glitter.vercel.app/og-image.png"],
   },
 };
 
