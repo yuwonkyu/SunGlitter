@@ -76,13 +76,23 @@ export default function MonthCalendar({ grouped }: MonthCalendarProps) {
               key={key}
               className={`min-h-15 bg-zinc-50 p-1 ${!isCurrentMonth ? "opacity-30" : ""}`}
             >
-              <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-medium ${
-                  isToday ? "bg-zinc-900 text-white" : "text-zinc-700"
-                }`}
-              >
-                {date.getDate()}
-              </span>
+              {(() => {
+                const day = date.getDay();
+                let colorClass = "text-zinc-700";
+                if (!isToday) {
+                  if (day === 0) colorClass = "text-red-500"; // 일요일
+                  else if (day === 6) colorClass = "text-blue-500"; // 토요일
+                }
+                return (
+                  <span
+                    className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-medium ${
+                      isToday ? "bg-zinc-900 text-white" : colorClass
+                    }`}
+                  >
+                    {date.getDate()}
+                  </span>
+                );
+              })()}
               <div className="mt-0.5 space-y-0.5">
                 {dayItems.map((item) => (
                   <div

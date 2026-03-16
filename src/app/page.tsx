@@ -2,10 +2,9 @@ import LinkCard, { type LinkItem } from "@/components/ui/LinkCard";
 
 const LINKS: LinkItem[] = [
   {
-    title: "예약 링크 (신청하기)",
-    subtitle: "준비중",
-    href: "#",
-    disabled: true,
+    title: "예약 안내",
+    subtitle: "DM 예약 방법 및 주의사항 안내",
+    href: "/reserve-guide",
   },
   {
     title: "예약 현황 (예약보기)",
