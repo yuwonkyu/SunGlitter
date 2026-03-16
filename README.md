@@ -1,23 +1,53 @@
-# 윤슬이네 스튜디오 링크 사이트
+# 윤슬이네 스튜디오 예약 서비스 (SunGlitter)
 
-모바일 중심으로 만든 링크 허브 + 예약현황 보드 프로젝트입니다.
+제주 구좌읍 월정리의 **윤슬이네 스튜디오**를 위한 전용 예약 안내/관리 서비스입니다.
+사용자는 링크 허브에서 예약 현황, 인스타그램, 지도 정보를 확인하고,
+운영자는 관리자 페이지에서 날짜·시간별 슬롯을 등록/수정/삭제합니다.
 
-## 스택
+## 서비스 구성
+
+- `/` : 모바일 중심 링크 허브
+- `/schedule` : 달력 기반 예약 현황 조회
+- `/********` : 관리자 전용 예약 슬롯 관리
+- `/********` : 고정 404 처리
+
+## 핵심 동작
+
+- 예약 현황은 날짜/시간 기준으로 정렬되어 사용자에게 표시됩니다.
+- 관리자 기능은 비공개로 동작합니다.
+
+- 예약 데이터는 Upstash Redis를 우선 사용하며,
+	Redis 설정이 없으면 로컬 메모리 저장으로 동작합니다.
+
+## 기술 스택
 
 - Next.js (App Router)
 - React
 - TypeScript
 - Tailwind CSS
-- Upstash Redis (버셀 배포용 예약현황 저장소)
+- Upstash Redis
 
-## 페이지
+## 운영 환경변수
 
-- / : 링크 허브 홈
-- /schedule : 예약현황 보기
-- /0000000000000-00000-000 : 관리자 예약현황 등록/수정/삭제
-- /admin : 접근 시 404 (숨김 처리)
+- `ADMIN_PASSWORD`: 관리자 로그인 비밀번호
+- `ADMIN_SESSION_SECRET`: 관리자 세션 서명 키
+- `UPSTASH_REDIS_REST_URL`: Upstash Redis URL
+- `UPSTASH_REDIS_REST_TOKEN`: Upstash Redis Token
+- `GATE_USER`: 관리자 경로 Basic Auth 아이디 (기본값 `admin`)
+- `GATE_PASSWORD`: 관리자 경로 Basic Auth 비밀번호 (필수)
 
-## 로컬 실행
+## 수정·재사용 금지 정책 (중요)
+
+본 저장소와 소스코드는 **윤슬이네 스튜디오 운영 목적에 한해** 제공됩니다.
+
+- 운영자의 명시적 사전 승인 없는 소스 수정, 복제, 배포, 재사용을 금지합니다.
+- 코드 일부/전체를 템플릿화하거나 다른 프로젝트로 전용하는 행위를 금지합니다.
+- 포크 후 기능 변경, UI 재활용, 상업적 사용, 파생 저작물 제작을 금지합니다.
+- 저장소 접근 권한이 있더라도 별도 허가 없는 사용권은 부여되지 않습니다.
+
+위 정책을 위반한 사용은 즉시 중단 요청 및 필요한 조치 대상이 될 수 있습니다.
+
+## 로컬 실행(운영자 전용)
 
 1. 의존성 설치
 
@@ -25,37 +55,12 @@
 npm install
 ```
 
-2. 환경변수 설정
+2. 프로젝트 루트에 `.env.local` 생성 후 환경변수 입력
 
-프로젝트 루트에 .env.local 파일을 만들고 .env 내용을 복사해 값 입력
-
-3. 개발 서버
+3. 개발 서버 실행
 
 ```bash
 npm run dev
 ```
 
-## 환경변수
-
-- ADMIN_PASSWORD: 관리자 로그인 비밀번호
-- ADMIN_SESSION_SECRET: 관리자 세션 서명 키
-- UPSTASH_REDIS_REST_URL: Upstash Redis URL
-- UPSTASH_REDIS_REST_TOKEN: Upstash Redis Token
-- GATE_USER: 관리자 경로 Basic Auth 아이디 (기본값: admin)
-- GATE_PASSWORD: 관리자 경로 Basic Auth 비밀번호 (필수 설정)
-
-참고: Redis 환경변수가 없으면 로컬 메모리 저장으로 동작하며 서버 재시작 시 데이터가 사라집니다.
-
-## 버셀 배포
-
-1. Git 저장소를 Vercel에 연결
-2. Project Settings > Environment Variables에 위 4개 값 등록
-3. 배포
-
-## 관리자 전용 수정 권한
-
-구현되어 있습니다.
-
-- /yoonseulhouse-admin-jhj 로그인 성공 시 HttpOnly 쿠키 세션 발급
-- /api/schedule의 POST/PUT/DELETE는 관리자 세션이 없으면 401 반환
-- 일반 사용자는 /schedule에서 조회만 가능
+참고: Redis 환경변수가 없으면 서버 재시작 시 예약 데이터가 초기화됩니다.
