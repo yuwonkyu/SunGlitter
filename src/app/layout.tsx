@@ -11,11 +11,11 @@ const notoSansKr = Noto_Sans_KR({
 export const metadata: Metadata = {
   title: "윤슬이네 스튜디오",
   description: "제주 구좌읍 월정리의 감성 스튜디오, 윤슬이네 스튜디오입니다. 예약 및 일정 확인은 아래 링크를 이용해 주세요.",
-  metadataBase: new URL("https://yoonseul.house"),
+  metadataBase: new URL("https://sun-glitter.vercel.app/"),
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    url: "https://yoonseul.house",
+    url: "https://sun-glitter.vercel.app/",
     siteName: "윤슬이네 스튜디오",
     title: "윤슬이네 스튜디오",
     description: "제주 구좌읍 월정리의 감성 스튜디오, 윤슬이네 스튜디오입니다. 예약 및 일정 확인은 아래 링크를 이용해 주세요.",
