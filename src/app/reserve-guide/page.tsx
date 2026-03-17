@@ -1,3 +1,5 @@
+import BackLink from "@/components/ui/BackLink";
+
 const ReserveGuidePage = () => {
   return (
     <div className="paper-bg min-h-screen px-5 py-8">
@@ -97,6 +99,7 @@ const ReserveGuidePage = () => {
             인스타그램 DM 보내기
           </a>
         </section>
+        <BackLink className="pt-3" />
       </main>
     </div>
   );
