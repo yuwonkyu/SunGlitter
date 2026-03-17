@@ -38,7 +38,7 @@ body {
   background-size: 100% 100%, 100% 100%, 120% 120%, 140% 140%, 130% 130%, 160% 160%, 200% 200%, 100% 100%;
   background-position: center, center, 0% 0%, 100% 100%, 40% 60%, 65% 20%, 0% 50%, center;
   background-blend-mode: normal, normal, screen, screen, screen, screen, soft-light, normal;
-  animation: sea-glitter 10s ease-in-out infinite alternate;
+  animation: sea-glitter 18s ease-in-out infinite alternate;
 }
 
 .paper-bg > * {
@@ -74,10 +74,19 @@ body {
   background-position: 80px 30px, 20px 120px;
   opacity: var(--glitter-a-opacity);
   animation:
-    glitter-drift 1s cubic-bezier(0.42, 0.0, 0.58, 1.0) infinite reverse,
+    glitter-drift 7s cubic-bezier(0.42, 0.0, 0.58, 1.0) infinite reverse,
     glitter-twinkle 4.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite reverse,
     glitter-sway 4.5s ease-out infinite;
   animation-delay: -0.1s, -0.2s, -0.3s;
+}
+
+html.animations-paused .paper-bg,
+html.animations-paused .paper-bg::before,
+html.animations-paused .paper-bg::after,
+.paper-bg.is-static,
+.paper-bg.is-static::before,
+.paper-bg.is-static::after {
+  animation: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

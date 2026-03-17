@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
+import EscapeAnimationStopper from "@/components/ui/EscapeAnimationStopper";
 import "./globals.css";
 
 const SITE_NAME = "윤슬이집 스튜디오";
@@ -77,7 +78,10 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => (
   <html lang="ko">
-    <body className={`${notoSansKr.variable} antialiased`}>{children}</body>
+    <body className={`${notoSansKr.variable} antialiased`}>
+      <EscapeAnimationStopper />
+      {children}
+    </body>
   </html>
 );
 
