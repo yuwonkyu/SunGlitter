@@ -3,47 +3,99 @@ const ReserveGuidePage = () => {
     <div className="paper-bg min-h-screen px-5 py-8">
       <main className="mx-auto w-full max-w-md">
         <section className="fade-up rounded-2xl border border-(--line) bg-(--card) p-6 shadow-[0_8px_24px_rgba(0,0,0,0.07)]">
-          <h1 className="text-2xl font-bold mb-2">예약 안내</h1>
+          <h1 className="mb-2 text-2xl font-bold">예약 안내</h1>
           <p className="mb-4 text-sm text-(--muted)">
-            인스타그램 DM으로 아래 양식에 맞춰 예약 신청을 해주세요.<br />
-            <span className="font-semibold">@yoonseul.house</span> 계정으로 보내주시면 상담 후 예약 일정을 잡아드립니다.
+            예약 및 촬영 문의 전, 아래 안내와 DM 문의 양식을 확인해 주세요.
+            <br />
+            <span className="font-semibold">@yoonseul.house</span> 계정 DM으로
+            문의해 주시면 빠르게 안내드립니다.
           </p>
+
           <div className="mb-4">
-            <h2 className="text-lg font-semibold mb-1">DM 예약 신청 양식</h2>
-            <div className="rounded bg-zinc-50 border border-zinc-200 p-3 text-sm">
+            <h2 className="mb-1 text-lg font-semibold">예약 확정 안내</h2>
+            <ul className="list-disc space-y-1 pl-5 text-sm">
+              <li>
+                위치: 제주 월정리 (제주특별자치도 제주시 구좌읍 월정1길 70-1)
+              </li>
+              <li>
+                주차: 인근 공용 주차장 이용 가능 (촬영팀 차량 기준 약 5대)
+              </li>
+              <li className="group">
+                결제: 계좌 입금 후 예약 최종 확정
+                <br />
+                <span className="inline-block  select-none rounded bg-zinc-100 px-2 py-0.5 font-medium text-zinc-700 blur-[3px] opacity-90 transition duration-150 hover:blur-none hover:opacity-100 active:blur-none active:opacity-100 group-hover:blur-none group-active:blur-none">
+                  국민은행 943202 00 074074 조형진
+                </span>
+
+              </li>
+              <li>
+                촬영 사진 활용 동의 시 5% 할인
+                <br />
+                (촬영 현장 사진 및 결과물의 홍보·포트폴리오 활용)
+              </li>
+              <li>장비 대여: 조명, 삼각대, 스탠드, 렌즈 등 사전 협의 가능</li>
+              <li>
+                이용 안내: 가구·소품 이동 가능, 촬영 후 원위치 정리 필수
+              </li>
+              <li>
+                예약 시간에는 촬영 준비 및 정리 시간이 포함됩니다.
+              </li>
+              <li>
+                파손 안내: 가구·소품·시설 파손/오염 시 복구 및 배상 비용이
+                청구될 수 있습니다.
+              </li>
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <h2 className="mb-1 text-lg font-semibold">DM 문의 양식</h2>
+            <div className="rounded border border-zinc-200 bg-zinc-50 p-3 text-sm">
               <div className="mb-2">
-                <span className="font-medium">1. 예약자</span> <span className="text-zinc-500">예시: 홍길동</span>
+                <span className="font-medium">1. 촬영 날짜 및 시간</span>{" "}
+                <span className="text-zinc-500">
+                  예시: 25.01.20 15:00 ~ 17:00 (2시간)
+                </span>
+                <p className="mt-1 text-xs text-zinc-500">
+                  시간당 50,000원 / 최소 2시간부터
+                </p>
               </div>
               <div className="mb-2">
-                <span className="font-medium">2. 예약 날짜</span> <span className="text-zinc-500">예시: 2026-04-10</span>
+                <span className="font-medium">2. 촬영 인원</span>{" "}
+                <span className="text-zinc-500">
+                  최대 4명 / 인원 추가 시 시간당 인당 10,000원
+                </span>
               </div>
               <div className="mb-2">
-                <span className="font-medium">3. 예약 시간</span> <span className="text-zinc-500">예시: 14:00~16:00</span>
+                <span className="font-medium">3. 촬영 내용</span>{" "}
+                <span className="text-zinc-500">
+                  예시: 브랜드, 유튜브, 드라마
+                </span>
               </div>
               <div className="mb-2">
-                <span className="font-medium">4. 촬영 인원</span> <span className="text-zinc-500">예시: 3명</span>
-              </div>
-              <div className="mb-2">
-                <span className="font-medium">5. 촬영 목적</span> <span className="text-zinc-500">예시: 가족사진</span>
+                <span className="font-medium">4. 필요 장비 여부</span>
               </div>
               <div>
-                <span className="font-medium">6. 요청사항</span> <span className="text-zinc-500">예시: 삼각대 및 조명을 빌릴 수 있을까요?</span>
+                <span className="font-medium">5. 촬영 사진 활용 동의</span>{" "}
+                <span className="text-zinc-500">O / X</span>
               </div>
             </div>
           </div>
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold mb-1">안내 및 주의사항</h2>
-            <ul className="list-disc pl-5 text-sm space-y-1">
-              <li>예약 시간은 <b>촬영준비, 촬영, 촬영정리</b> 모든 시간을 포함한 시간입니다.</li>
-              <li>스튜디오 이용 후 <b>처음과 같이 정리</b>해 주세요.</li>
-              <li>양식에 맞게 DM 주시면 상담 후 예약 일정을 잡아드립니다.</li>
-              <li>예약 확정 전에는 일정이 보류될 수 있습니다.</li>
-              <li>예약 변경/취소는 최소 하루 전에 꼭 연락해 주세요.</li>
-              <li>스튜디오 내 음식물 반입, 흡연, 반려동물 출입은 제한될 수 있습니다.</li>
-              <li>기타 문의사항은 DM으로 언제든 문의해 주세요.</li>
-            </ul>
-          </div>
-          <a href="https://www.instagram.com/yoonseul.house/" target="_blank" rel="noopener noreferrer" className="block w-full mt-4 text-center rounded-md bg-zinc-900 px-3 py-2 text-sm text-white font-semibold">인스타그램 DM 보내기</a>
+
+          <p className="mb-4 text-sm text-(--muted)">
+            제주의 빛과 바람이 머무는 공간 윤슬이집에서 좋은 촬영 되시길
+            바랍니다.
+            <br />
+            문의: 010-8641-3015
+          </p>
+
+          <a
+            href="https://www.instagram.com/yoonseul.house/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 block w-full rounded-md bg-zinc-900 px-3 py-2 text-center text-sm font-semibold text-white"
+          >
+            인스타그램 DM 보내기
+          </a>
         </section>
       </main>
     </div>

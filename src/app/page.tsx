@@ -19,8 +19,8 @@ const LINKS: LinkItem[] = [
   },
   {
     title: "네이버 지도",
-    subtitle: "제주특별자치도 제주시 구좌읍 월정1길 70-3",
-    href: "https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%ED%8A%B9%EB%B3%84%EC%9E%90%EC%B9%98%EB%8F%84%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EA%B5%AC%EC%A2%8C%EC%9D%8D%20%EC%9B%94%EC%A0%951%EA%B8%B8%2070-3",
+    subtitle: "제주특별자치도 제주시 구좌읍 월정리 607",
+    href: "https://naver.me/xsZAv68G",
     external: true,
   },
 ];
@@ -33,11 +33,10 @@ const Home = () => (
           YOONSEUL HOUSE
         </p>
         <h1 className="mt-2 text-2xl font-bold text-foreground">
-          윤슬이네 스튜디오
+          윤슬이집
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-(--muted)">
-          제주 구좌읍 월정리에 있는 감성 스튜디오입니다. 아래 링크에서 예약 및
-          스케쥴을 확인해 주세요.
+          제주 월정리 바다 앞, 돌담 사이마다 자연광이 머무는 촬영 스튜디오.
         </p>
       </section>
 
