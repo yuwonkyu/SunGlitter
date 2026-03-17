@@ -10,10 +10,10 @@ interface StatusBadgeProps {
 /**
  * 예약 상태를 나타내는 배지 컴포넌트.
  */
-export default function StatusBadge({
+const StatusBadge = ({
   status,
   variant = "full",
-}: StatusBadgeProps) {
+}: StatusBadgeProps) => {
   const shape =
     variant === "full"
       ? "rounded-full border px-2 py-1 text-xs"
@@ -24,4 +24,6 @@ export default function StatusBadge({
       {statusLabel[status]}
     </span>
   );
-}
+};
+
+export default StatusBadge;

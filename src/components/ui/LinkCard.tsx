@@ -19,7 +19,7 @@ const BASE_CLASS =
 /**
  * 홈 페이지의 링크 카드. disabled / external / internal 세 가지 형태를 지원합니다.
  */
-export default function LinkCard({ item, animationDelay = 0 }: LinkCardProps) {
+const LinkCard = ({ item, animationDelay = 0 }: LinkCardProps) => {
   const style = { animationDelay: `${animationDelay}ms` } as const;
 
   const content = (
@@ -59,4 +59,6 @@ export default function LinkCard({ item, animationDelay = 0 }: LinkCardProps) {
       {content}
     </Link>
   );
-}
+};
+
+export default LinkCard;

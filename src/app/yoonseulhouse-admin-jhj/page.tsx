@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { groupItemsByDate, toDateKey } from "@/lib/calendar";
@@ -19,7 +18,7 @@ const makeDraft = (date: string): Draft => ({
   note: "",
 });
 
-export default function AdminPage() {
+const AdminPage = () => {
   const [items, setItems] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
@@ -202,4 +201,6 @@ export default function AdminPage() {
       <BackLink className="pt-3" />
     </PageShell>
   );
-}
+};
+
+export default AdminPage;

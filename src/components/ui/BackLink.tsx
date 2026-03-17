@@ -9,11 +9,11 @@ interface BackLinkProps {
 /**
  * "홈으로 돌아가기" 같은 뒤로가기 텍스트 링크.
  */
-export default function BackLink({
+const BackLink = ({
   href = "/",
   label = "홈으로 돌아가기",
   className = "",
-}: BackLinkProps) {
+}: BackLinkProps) => {
   return (
     <div className={`text-center text-sm ${className}`}>
       <Link href={href} className="underline underline-offset-4 text-zinc-700">
@@ -21,4 +21,6 @@ export default function BackLink({
       </Link>
     </div>
   );
-}
+};
+
+export default BackLink;

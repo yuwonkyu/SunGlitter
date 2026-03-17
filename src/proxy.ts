@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function proxy(request: NextRequest) {
+export const proxy = (request: NextRequest) => {
   const basicAuth = request.headers.get("authorization");
 
   if (basicAuth) {
@@ -29,7 +29,7 @@ export function proxy(request: NextRequest) {
       "WWW-Authenticate": 'Basic realm="Admin Area", charset="UTF-8"',
     },
   });
-}
+};
 
 export const config = {
   matcher: "/yoonseulhouse-admin-jhj/:path*",

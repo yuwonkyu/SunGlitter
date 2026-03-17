@@ -25,33 +25,33 @@ const LINKS: LinkItem[] = [
   },
 ];
 
-export default function Home() {
-  return (
-    <div className="paper-bg min-h-screen px-5 py-8">
-      <main className="mx-auto w-full max-w-md">
-        <section className="fade-up rounded-2xl border border-(--line) bg-(--card) p-6 shadow-[0_8px_24px_rgba(0,0,0,0.07)]">
-          <p className="text-xs tracking-[0.3em] text-(--muted)">
-            YOONSEUL HOUSE
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground">
-            윤슬이네 스튜디오
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-(--muted)">
-            제주 구좌읍 월정리에 있는 감성 스튜디오입니다. 아래 링크에서 예약 및
-            스케쥴을 확인해 주세요.
-          </p>
-        </section>
+const Home = () => (
+  <div className="paper-bg min-h-screen px-5 py-8">
+    <main className="mx-auto w-full max-w-md">
+      <section className="fade-up rounded-2xl border border-(--line) bg-(--card) p-6 shadow-[0_8px_24px_rgba(0,0,0,0.07)]">
+        <p className="text-xs tracking-[0.3em] text-(--muted)">
+          YOONSEUL HOUSE
+        </p>
+        <h1 className="mt-2 text-2xl font-bold text-foreground">
+          윤슬이네 스튜디오
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-(--muted)">
+          제주 구좌읍 월정리에 있는 감성 스튜디오입니다. 아래 링크에서 예약 및
+          스케쥴을 확인해 주세요.
+        </p>
+      </section>
 
-        <section className="mt-5 space-y-3">
-          {LINKS.map((item, index) => (
-            <LinkCard
-              key={item.title}
-              item={item}
-              animationDelay={index * 80}
-            />
-          ))}
-        </section>
-      </main>
-    </div>
-  );
-}
+      <section className="mt-5 space-y-3">
+        {LINKS.map((item, index) => (
+          <LinkCard
+            key={item.title}
+            item={item}
+            animationDelay={index * 80}
+          />
+        ))}
+      </section>
+    </main>
+  </div>
+);
+
+export default Home;

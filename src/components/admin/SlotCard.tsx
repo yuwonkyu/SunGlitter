@@ -10,7 +10,7 @@ interface SlotCardProps {
 /**
  * 관리자 페이지에서 예약 슬롯 하나를 표시하는 카드. 수정/삭제 버튼 포함.
  */
-export default function SlotCard({ item, onEdit, onDelete }: SlotCardProps) {
+const SlotCard = ({ item, onEdit, onDelete }: SlotCardProps) => {
   return (
     <article className="rounded-lg border border-zinc-300 bg-white p-3">
       <div className="flex items-center justify-between gap-3">
@@ -38,4 +38,6 @@ export default function SlotCard({ item, onEdit, onDelete }: SlotCardProps) {
       </div>
     </article>
   );
-}
+};
+
+export default SlotCard;

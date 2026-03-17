@@ -45,14 +45,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
-  return (
-    <html lang="ko">
-      <body className={`${notoSansKr.variable} antialiased`}>{children}</body>
-    </html>
-  );
-}
+}>) => (
+  <html lang="ko">
+    <body className={`${notoSansKr.variable} antialiased`}>{children}</body>
+  </html>
+);
+
+export default RootLayout;

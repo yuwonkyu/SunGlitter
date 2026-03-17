@@ -19,7 +19,7 @@ interface MonthCalendarProps {
 /**
  * 월별 달력 그리드. 각 날짜 셀에 예약 슬롯(시간 + 마스킹된 이름)을 표시합니다.
  */
-export default function MonthCalendar({ grouped }: MonthCalendarProps) {
+const MonthCalendar = ({ grouped }: MonthCalendarProps) => {
   const [viewMonth, setViewMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -125,4 +125,6 @@ export default function MonthCalendar({ grouped }: MonthCalendarProps) {
       </div>
     </section>
   );
-}
+};
+
+export default MonthCalendar;

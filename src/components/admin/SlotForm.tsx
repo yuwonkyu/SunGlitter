@@ -29,13 +29,13 @@ interface SlotFormProps {
 /**
  * 예약 슬롯 등록/수정 폼. 날짜, 시(0–23), 분(00/30), 예약자명, 상태, 메모를 입력합니다.
  */
-export default function SlotForm({
+const SlotForm = ({
   draft,
   saving,
   onChange,
   onSubmit,
   onReset,
-}: SlotFormProps) {
+}: SlotFormProps) => {
   const [hour, minute] = draft.time.split(":");
 
   return (
@@ -133,4 +133,6 @@ export default function SlotForm({
       </div>
     </form>
   );
-}
+};
+
+export default SlotForm;

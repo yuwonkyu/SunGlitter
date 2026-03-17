@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { sessionCookieOptions } from "@/lib/admin-auth";
 
-export async function POST() {
+export const POST = async () => {
   const cookieStore = await cookies();
   cookieStore.set(sessionCookieOptions.name, "", {
     ...sessionCookieOptions,
@@ -10,4 +10,4 @@ export async function POST() {
   });
 
   return NextResponse.json({ ok: true });
-}
+};

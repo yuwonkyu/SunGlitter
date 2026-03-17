@@ -1,4 +1,4 @@
-export default function ReserveGuidePage() {
+const ReserveGuidePage = () => {
   return (
     <div className="paper-bg min-h-screen px-5 py-8">
       <main className="mx-auto w-full max-w-md">
@@ -48,4 +48,6 @@ export default function ReserveGuidePage() {
       </main>
     </div>
   );
-}
+};
+
+export default ReserveGuidePage;

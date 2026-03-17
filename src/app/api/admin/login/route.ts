@@ -7,12 +7,12 @@ import {
   verifyAdminPassword,
 } from "@/lib/admin-auth";
 
-export async function GET() {
+export const GET = async () => {
   const session = await getAdminSession();
   return NextResponse.json({ authenticated: Boolean(session) });
-}
+};
 
-export async function POST(request: Request) {
+export const POST = async (request: Request) => {
   const body = (await request.json()) as { password?: string };
 
   if (!body.password || !verifyAdminPassword(body.password)) {
@@ -27,4 +27,4 @@ export async function POST(request: Request) {
   cookieStore.set(sessionCookieOptions.name, token, sessionCookieOptions);
 
   return NextResponse.json({ ok: true });
-}
+};

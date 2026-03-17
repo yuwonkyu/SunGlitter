@@ -8,7 +8,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import BackLink from "@/components/ui/BackLink";
 import MonthCalendar from "@/components/calendar/MonthCalendar";
 
-export default function SchedulePage() {
+const SchedulePage = () => {
   const [items, setItems] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,4 +40,6 @@ export default function SchedulePage() {
       <BackLink />
     </PageShell>
   );
-}
+};
+
+export default SchedulePage;

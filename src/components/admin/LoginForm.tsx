@@ -9,11 +9,11 @@ interface LoginFormProps {
 /**
  * 관리자 비밀번호 로그인 폼.
  */
-export default function LoginForm({
+const LoginForm = ({
   password,
   onPasswordChange,
   onSubmit,
-}: LoginFormProps) {
+}: LoginFormProps) => {
   return (
     <form
       onSubmit={onSubmit}
@@ -36,4 +36,6 @@ export default function LoginForm({
       </button>
     </form>
   );
-}
+};
+
+export default LoginForm;

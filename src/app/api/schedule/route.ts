@@ -18,12 +18,12 @@ const unauthorized = () =>
     { status: 401 },
   );
 
-export async function GET() {
+export const GET = async () => {
   const items = await getScheduleItems();
   return NextResponse.json(items);
-}
+};
 
-export async function POST(request: Request) {
+export const POST = async (request: Request) => {
   const session = await getAdminSession();
   if (!session) {
     return unauthorized();
@@ -65,9 +65,9 @@ export async function POST(request: Request) {
   const items = await getScheduleItems();
   const saved = await saveScheduleItems([...items, newItem]);
   return NextResponse.json(saved);
-}
+};
 
-export async function PUT(request: Request) {
+export const PUT = async (request: Request) => {
   const session = await getAdminSession();
   if (!session) {
     return unauthorized();
@@ -123,9 +123,9 @@ export async function PUT(request: Request) {
 
   const saved = await saveScheduleItems(updated);
   return NextResponse.json(saved);
-}
+};
 
-export async function DELETE(request: Request) {
+export const DELETE = async (request: Request) => {
   const session = await getAdminSession();
   if (!session) {
     return unauthorized();
@@ -143,4 +143,4 @@ export async function DELETE(request: Request) {
   const filtered = items.filter((item) => item.id !== body.id);
   const saved = await saveScheduleItems(filtered);
   return NextResponse.json(saved);
-}
+};

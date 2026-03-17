@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 
-export default function AdminHiddenPage() {
+const AdminHiddenPage = () => {
   notFound();
-}
+};
+
+export default AdminHiddenPage;
