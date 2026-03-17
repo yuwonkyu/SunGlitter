@@ -1,4 +1,25 @@
+import type { Metadata } from "next";
 import BackLink from "@/components/ui/BackLink";
+
+export const metadata: Metadata = {
+  title: "예약 안내",
+  description:
+    "윤슬이집 스튜디오 예약 안내 페이지입니다. 위치, 주차, 결제, 장비 대여, DM 문의 양식을 확인하세요.",
+  alternates: {
+    canonical: "/reserve-guide",
+  },
+  openGraph: {
+    title: "예약 안내 | 윤슬이집 스튜디오",
+    description:
+      "윤슬이집 스튜디오 예약 안내 페이지입니다. 위치, 주차, 결제, 장비 대여, DM 문의 양식을 확인하세요.",
+    url: "/reserve-guide",
+  },
+  twitter: {
+    title: "예약 안내 | 윤슬이집 스튜디오",
+    description:
+      "윤슬이집 스튜디오 예약 안내 페이지입니다. 위치, 주차, 결제, 장비 대여, DM 문의 양식을 확인하세요.",
+  },
+};
 
 const ReserveGuidePage = () => {
   return (
