@@ -6,8 +6,6 @@
   --card: #fbf8f2;
   --line: #d8d0c3;
   --muted: #6a6257;
-  --glitter-w-opacity: 0.38;
-  --glitter-a-opacity: 0.25;
 }
 
 @theme inline {
@@ -38,7 +36,6 @@ body {
   background-size: 100% 100%, 100% 100%, 120% 120%, 140% 140%, 130% 130%, 160% 160%, 200% 200%, 100% 100%;
   background-position: center, center, 0% 0%, 100% 100%, 40% 60%, 65% 20%, 0% 50%, center;
   background-blend-mode: normal, normal, screen, screen, screen, screen, soft-light, normal;
-  animation: sea-glitter 18s ease-in-out infinite alternate;
 }
 
 .paper-bg > * {
@@ -62,43 +59,13 @@ body {
 .paper-bg::before {
   background-size: 50px 50px, 100px 100px;
   background-position: 0% 0%, 40px 60px;
-  opacity: var(--glitter-w-opacity);
-  animation: 
-    glitter-drift 300s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite,
-    glitter-twinkle 4.5s ease-in-out infinite alternate,
-    glitter-sway 6.5s ease-in-out infinite;
+  opacity: 0.38;
 }
 
 .paper-bg::after {
   background-size: 50px 50px, 100px 100px;
   background-position: 80px 30px, 20px 120px;
-  opacity: var(--glitter-a-opacity);
-  animation:
-    glitter-drift 7s cubic-bezier(0.42, 0.0, 0.58, 1.0) infinite reverse,
-    glitter-twinkle 4.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite reverse,
-    glitter-sway 4.5s ease-out infinite;
-  animation-delay: -0.1s, -0.2s, -0.3s;
-}
-
-html.animations-paused .paper-bg,
-html.animations-paused .paper-bg::before,
-html.animations-paused .paper-bg::after,
-.paper-bg.is-static,
-.paper-bg.is-static::before,
-.paper-bg.is-static::after {
-  animation: none !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .paper-bg {
-    animation: none;
-  }
-
-  .paper-bg::before,
-  .paper-bg::after {
-    animation: none;
-    opacity: 0.1;
-  }
+  opacity: 0.25;
 }
 
 .card-in {
@@ -131,62 +98,3 @@ html.animations-paused .paper-bg::after,
   }
 }
 
-@keyframes sea-glitter {
-  0% {
-    background-position: center, center, 0% 0%, 100% 100%, 40% 60%, 65% 20%, 0% 50%, center;
-  }
-  50% {
-    background-position: center, center, 22% 14%, 78% 72%, 56% 48%, 38% 42%, 50% 44%, center;
-  }
-  100% {
-    background-position: center, center, 42% 30%, 58% 52%, 72% 34%, 24% 58%, 100% 38%, center;
-  }
-}
-
-@keyframes glitter-drift {
-  0% {
-    transform: translate3d(0%, 0%, 0) scale(1);
-  }
-  25% {
-    transform: translate3d(6%, -4%, 0) scale(1.02);
-  }
-  50% {
-    transform: translate3d(-3%, 5%, 0) scale(1.01);
-  }
-  75% {
-    transform: translate3d(8%, -2%, 0) scale(1.03);
-  }
-  100% {
-    transform: translate3d(-4%, 2%, 0) scale(1);
-  }
-}
-
-@keyframes glitter-twinkle {
-  0% {
-    opacity: 0.15;
-  }
-  40% {
-    opacity: 0.35;
-  }
-  70% {
-    opacity: 0.2;
-  }
-  100% {
-    opacity: 0.45;
-  }
-}
-
-@keyframes glitter-sway {
-  0% {
-    transform: rotateZ(-0.5deg);
-  }
-  33% {
-    transform: rotateZ(0.8deg);
-  }
-  66% {
-    transform: rotateZ(-0.3deg);
-  }
-  100% {
-    transform: rotateZ(0.2deg);
-  }
-}
