@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { groupItemsByDate, toDateKey } from "@/lib/calendar";
+import { groupItemsByDate } from "@/lib/calendar";
 import type { ScheduleItem } from "@/types/schedule";
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
@@ -26,15 +26,14 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
-  const [draft, setDraft] = useState<Draft>(() =>
-    makeDraft(toDateKey(new Date())),
-  );
+  const [draft, setDraft] = useState<Draft>(() => makeDraft(""));
   const [toast, setToast] = useState<{
     text: string;
     tone: "success" | "error";
   } | null>(null);
   const [saving, setSaving] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(() => toDateKey(new Date()));
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [hasLoadedItems, setHasLoadedItems] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   const showToast = useCallback(
@@ -66,7 +65,7 @@ const AdminPage = () => {
     }
   }, []);
 
-  // 초기 로드 및 인증 상태 확인
+  // 초기 로드: 인증 상태만 확인 (예약 목록은 아직 조회하지 않음)
   useEffect(() => {
     const bootstrap = async () => {
       try {
@@ -75,19 +74,32 @@ const AdminPage = () => {
           const result = (await authRes.json()) as { authenticated: boolean };
           setAuthenticated(result.authenticated);
         }
-        await loadData();
       } finally {
         setLoading(false);
       }
     };
 
     void bootstrap();
-  }, [loadData]);
+  }, []);
+
+  // 날짜를 처음 선택한 시점에만 예약 목록 1회 조회
+  useEffect(() => {
+    if (!selectedDate || hasLoadedItems) {
+      return;
+    }
+
+    const fetchOnce = async () => {
+      await loadData();
+      setHasLoadedItems(true);
+    };
+
+    void fetchOnce();
+  }, [selectedDate, hasLoadedItems, loadData]);
 
   // 날짜별 그룹화 및 선택된 날짜의 아이템
   const grouped = useMemo(() => groupItemsByDate(items), [items]);
   const selectedItems = useMemo(
-    () => grouped[selectedDate] ?? [],
+    () => (selectedDate ? (grouped[selectedDate] ?? []) : []),
     [grouped, selectedDate],
   );
 
@@ -115,14 +127,16 @@ const AdminPage = () => {
   const handleLogout = useCallback(async () => {
     await fetch("/api/admin/logout", { method: "POST" });
     setAuthenticated(false);
-    setDraft(makeDraft(selectedDate));
+    setDraft(makeDraft(selectedDate ?? ""));
     showToast("로그아웃 되었습니다.");
   }, [selectedDate, showToast]);
 
   // 드래프트 변경
   const handleDraftChange = useCallback(
     (next: Draft) => {
-      if (next.date !== draft.date) setSelectedDate(next.date);
+      if (next.date !== draft.date) {
+        setSelectedDate(next.date ? next.date : null);
+      }
       setDraft(next);
     },
     [draft.date],
@@ -144,10 +158,12 @@ const AdminPage = () => {
         return;
       }
       setItems((await res.json()) as ScheduleItem[]);
-      setDraft(makeDraft(selectedDate));
+      setHasLoadedItems(true);
+      setSelectedDate(draft.date);
+      setDraft(makeDraft(draft.date));
       showToast(draft.id ? "수정 완료" : "등록 완료");
     },
-    [draft, selectedDate, showToast],
+    [draft, showToast],
   );
 
   // 슬롯 삭제
@@ -163,8 +179,9 @@ const AdminPage = () => {
         return;
       }
       setItems((await res.json()) as ScheduleItem[]);
+      setHasLoadedItems(true);
       if (draft.id === id) {
-        setDraft(makeDraft(selectedDate));
+        setDraft(makeDraft(selectedDate ?? ""));
       }
       showToast("삭제 완료");
     },
@@ -189,6 +206,7 @@ const AdminPage = () => {
 
   // 슬롯 편집 시작
   const handleEdit = useCallback((item: ScheduleItem) => {
+    setSelectedDate(item.date);
     setDraft({
       id: item.id,
       date: item.date,
@@ -201,7 +219,7 @@ const AdminPage = () => {
 
   // 폼 초기화
   const handleReset = useCallback(() => {
-    setDraft(makeDraft(selectedDate));
+    setDraft(makeDraft(selectedDate ?? ""));
   }, [selectedDate]);
 
   if (loading) {
@@ -246,17 +264,25 @@ const AdminPage = () => {
       <section className="space-y-3 rounded-xl border border-zinc-300 bg-zinc-50 p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold">{selectedDate} 슬롯 목록</h3>
+            <h3 className="text-sm font-semibold">
+              {selectedDate ? `${selectedDate} 슬롯 목록` : "슬롯 목록"}
+            </h3>
             <p className="mt-1 text-xs text-zinc-500">
-              날짜를 직접 바꾸면 해당 날짜 슬롯만 표시됩니다.
+              예약 슬롯 등록에서 날짜를 선택하면 해당 날짜의 슬롯 목록이
+              표시됩니다.
             </p>
           </div>
-          <span className="rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs text-zinc-600">
-            총 {selectedItems.length}건
+          <span className="inline-flex shrink-0 whitespace-nowrap rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs text-zinc-600">
+            총 {selectedDate ? selectedItems.length : "-"}건
           </span>
         </div>
 
-        {selectedItems.length === 0 ? (
+        {!selectedDate ? (
+          <p className="rounded-xl border border-dashed border-zinc-300 bg-white p-4 text-sm text-zinc-600">
+            날짜를 먼저 선택해 주세요. 선택 전에는 슬롯 목록을 조회하지
+            않습니다.
+          </p>
+        ) : selectedItems.length === 0 ? (
           <p className="rounded-xl border border-dashed border-zinc-300 bg-white p-4 text-sm text-zinc-600">
             아직 등록된 슬롯이 없습니다.
           </p>
