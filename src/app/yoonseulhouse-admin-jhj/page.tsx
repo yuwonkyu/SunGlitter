@@ -7,8 +7,23 @@ import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
 import BackLink from "@/components/ui/BackLink";
 import LoginForm from "@/components/admin/LoginForm";
+import LogoutButton from "@/components/admin/LogoutButton";
 import SlotForm, { type Draft } from "@/components/admin/SlotForm";
-import SlotCard from "@/components/admin/SlotCard";
+import SlotListSection from "@/components/admin/SlotListSection";
+import DeleteConfirmDialog from "@/components/admin/DeleteConfirmDialog";
+import StatusToast, {
+  type StatusToastTone,
+} from "@/components/admin/StatusToast";
+
+type ToastState = {
+  text: string;
+  tone: StatusToastTone;
+};
+
+const TOAST_DURATION_MS = 2500;
+const ADMIN_LOGIN_API = "/api/admin/login";
+const ADMIN_LOGOUT_API = "/api/admin/logout";
+const SCHEDULE_API = "/api/schedule";
 
 /**
  * 선택된 날짜의 기본 드래프트 생성
@@ -23,14 +38,11 @@ const makeDraft = (date: string): Draft => ({
 
 const AdminPage = () => {
   const [items, setItems] = useState<ScheduleItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [draft, setDraft] = useState<Draft>(() => makeDraft(""));
-  const [toast, setToast] = useState<{
-    text: string;
-    tone: "success" | "error";
-  } | null>(null);
+  const [toast, setToast] = useState<ToastState | null>(null);
   const [saving, setSaving] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [hasLoadedItems, setHasLoadedItems] = useState(false);
@@ -50,32 +62,32 @@ const AdminPage = () => {
 
     const timer = setTimeout(() => {
       setToast(null);
-    }, 2500);
+    }, TOAST_DURATION_MS);
 
     return () => clearTimeout(timer);
   }, [toast]);
 
-  // 데이터 로드
-  const loadData = useCallback(async () => {
+  // 예약 목록 조회
+  const fetchScheduleItems = useCallback(async () => {
     try {
-      const res = await fetch("/api/schedule", { cache: "no-store" });
+      const res = await fetch(SCHEDULE_API, { cache: "no-store" });
       if (res.ok) setItems((await res.json()) as ScheduleItem[]);
     } catch (error) {
       console.error("Failed to load schedule items", error);
     }
   }, []);
 
-  // 초기 로드: 인증 상태만 확인 (예약 목록은 아직 조회하지 않음)
+  // 초기 진입 시에는 인증 상태만 확인 (예약 목록은 아직 조회하지 않음)
   useEffect(() => {
     const bootstrap = async () => {
       try {
-        const authRes = await fetch("/api/admin/login", { cache: "no-store" });
+        const authRes = await fetch(ADMIN_LOGIN_API, { cache: "no-store" });
         if (authRes.ok) {
           const result = (await authRes.json()) as { authenticated: boolean };
           setAuthenticated(result.authenticated);
         }
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -89,12 +101,12 @@ const AdminPage = () => {
     }
 
     const fetchOnce = async () => {
-      await loadData();
+      await fetchScheduleItems();
       setHasLoadedItems(true);
     };
 
     void fetchOnce();
-  }, [selectedDate, hasLoadedItems, loadData]);
+  }, [selectedDate, hasLoadedItems, fetchScheduleItems]);
 
   // 날짜별 그룹화 및 선택된 날짜의 아이템
   const grouped = useMemo(() => groupItemsByDate(items), [items]);
@@ -107,7 +119,7 @@ const AdminPage = () => {
   const handleLogin = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      const res = await fetch("/api/admin/login", {
+      const res = await fetch(ADMIN_LOGIN_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
@@ -125,7 +137,7 @@ const AdminPage = () => {
 
   // 로그아웃
   const handleLogout = useCallback(async () => {
-    await fetch("/api/admin/logout", { method: "POST" });
+    await fetch(ADMIN_LOGOUT_API, { method: "POST" });
     setAuthenticated(false);
     setDraft(makeDraft(selectedDate ?? ""));
     showToast("로그아웃 되었습니다.");
@@ -147,7 +159,7 @@ const AdminPage = () => {
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       setSaving(true);
-      const res = await fetch("/api/schedule", {
+      const res = await fetch(SCHEDULE_API, {
         method: draft.id ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(draft),
@@ -169,7 +181,7 @@ const AdminPage = () => {
   // 슬롯 삭제
   const handleDeleteConfirm = useCallback(
     async (id: string) => {
-      const res = await fetch("/api/schedule", {
+      const res = await fetch(SCHEDULE_API, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -222,7 +234,7 @@ const AdminPage = () => {
     setDraft(makeDraft(selectedDate ?? ""));
   }, [selectedDate]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="paper-bg min-h-screen p-6 text-sm">불러오는 중...</div>
     );
@@ -250,100 +262,26 @@ const AdminPage = () => {
             onSubmit={submitDraft}
             onReset={handleReset}
           />
-          <button
-            onClick={handleLogout}
-            className="w-full rounded-md border border-zinc-500 bg-zinc-100 px-3 py-2 text-sm"
-            type="button"
-            aria-label="로그아웃"
-          >
-            로그아웃
-          </button>
+          <LogoutButton onClick={() => void handleLogout()} />
         </>
       )}
 
-      <section className="space-y-3 rounded-xl border border-zinc-300 bg-zinc-50 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h3 className="text-sm font-semibold">
-              {selectedDate ? `${selectedDate} 슬롯 목록` : "슬롯 목록"}
-            </h3>
-            <p className="mt-1 text-xs text-zinc-500">
-              예약 슬롯 등록에서 날짜를 선택하면 해당 날짜의 슬롯 목록이
-              표시됩니다.
-            </p>
-          </div>
-          <span className="inline-flex shrink-0 whitespace-nowrap rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs text-zinc-600">
-            총 {selectedDate ? selectedItems.length : "-"}건
-          </span>
-        </div>
-
-        {!selectedDate ? (
-          <p className="rounded-xl border border-dashed border-zinc-300 bg-white p-4 text-sm text-zinc-600">
-            날짜를 먼저 선택해 주세요. 선택 전에는 슬롯 목록을 조회하지
-            않습니다.
-          </p>
-        ) : selectedItems.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-zinc-300 bg-white p-4 text-sm text-zinc-600">
-            아직 등록된 슬롯이 없습니다.
-          </p>
-        ) : (
-          selectedItems.map((item) => (
-            <SlotCard
-              key={item.id}
-              item={item}
-              onEdit={handleEdit}
-              onDelete={openDeleteConfirm}
-            />
-          ))
-        )}
-      </section>
+      <SlotListSection
+        selectedDate={selectedDate}
+        selectedItems={selectedItems}
+        onEdit={handleEdit}
+        onDelete={openDeleteConfirm}
+      />
 
       <BackLink className="pt-3" />
 
-      {deleteTargetId ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/35 px-4">
-          <div className="w-full max-w-sm rounded-xl border border-zinc-300 bg-white p-4 shadow-xl">
-            <p className="text-sm font-semibold text-zinc-900">
-              이 슬롯을 삭제하시겠습니까?
-            </p>
-            <p className="mt-1 text-xs text-zinc-600">
-              삭제 후에는 되돌릴 수 없습니다.
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={closeDeleteConfirm}
-                className="rounded-md border border-zinc-400 px-3 py-2 text-sm text-zinc-700"
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={() => void handleDelete()}
-                className="rounded-md bg-red-600 px-3 py-2 text-sm text-white"
-              >
-                삭제
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <DeleteConfirmDialog
+        open={Boolean(deleteTargetId)}
+        onCancel={closeDeleteConfirm}
+        onConfirm={() => void handleDelete()}
+      />
 
-      {toast ? (
-        <div className="fixed inset-x-0 bottom-5 z-50 flex justify-center px-4">
-          <div
-            className={`w-full max-w-sm rounded-lg border px-4 py-3 text-sm shadow-lg ${
-              toast.tone === "error"
-                ? "border-red-200 bg-red-50 text-red-700"
-                : "border-emerald-200 bg-emerald-50 text-emerald-700"
-            }`}
-            role="status"
-            aria-live="polite"
-          >
-            {toast.text}
-          </div>
-        </div>
-      ) : null}
+      {toast ? <StatusToast text={toast.text} tone={toast.tone} /> : null}
     </PageShell>
   );
 };
