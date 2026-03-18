@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { groupItemsByDate, toDateKey } from "@/lib/calendar";
 import type { ScheduleItem } from "@/types/schedule";
 import PageShell from "@/components/ui/PageShell";
@@ -10,6 +10,9 @@ import LoginForm from "@/components/admin/LoginForm";
 import SlotForm, { type Draft } from "@/components/admin/SlotForm";
 import SlotCard from "@/components/admin/SlotCard";
 
+/**
+ * 선택된 날짜의 기본 드래프트 생성
+ */
 const makeDraft = (date: string): Draft => ({
   date,
   time: "00:00",
@@ -30,11 +33,17 @@ const AdminPage = () => {
   const [saving, setSaving] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() => toDateKey(new Date()));
 
-  const loadData = async () => {
-    const res = await fetch("/api/schedule", { cache: "no-store" });
-    if (res.ok) setItems((await res.json()) as ScheduleItem[]);
-  };
+  // 데이터 로드
+  const loadData = useCallback(async () => {
+    try {
+      const res = await fetch("/api/schedule", { cache: "no-store" });
+      if (res.ok) setItems((await res.json()) as ScheduleItem[]);
+    } catch (error) {
+      console.error("Failed to load schedule items", error);
+    }
+  }, []);
 
+  // 초기 로드 및 인증 상태 확인
   useEffect(() => {
     const bootstrap = async () => {
       try {
@@ -50,72 +59,112 @@ const AdminPage = () => {
     };
 
     void bootstrap();
-  }, []);
+  }, [loadData]);
 
+  // 날짜별 그룹화 및 선택된 날짜의 아이템
   const grouped = useMemo(() => groupItemsByDate(items), [items]);
-  const selectedItems = grouped[selectedDate] ?? [];
+  const selectedItems = useMemo(
+    () => grouped[selectedDate] ?? [],
+    [grouped, selectedDate],
+  );
 
-  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-    if (!res.ok) {
-      setMessage("로그인에 실패했습니다.");
-      return;
-    }
-    setAuthenticated(true);
-    setPassword("");
-    setMessage("로그인 되었습니다.");
-  };
+  // 로그인
+  const handleLogin = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (!res.ok) {
+        setMessage("로그인에 실패했습니다.");
+        return;
+      }
+      setAuthenticated(true);
+      setPassword("");
+      setMessage("로그인 되었습니다.");
+    },
+    [password],
+  );
 
-  const handleLogout = async () => {
+  // 로그아웃
+  const handleLogout = useCallback(async () => {
     await fetch("/api/admin/logout", { method: "POST" });
     setAuthenticated(false);
     setDraft(makeDraft(selectedDate));
     setMessage("로그아웃 되었습니다.");
-  };
+  }, [selectedDate]);
 
-  const handleDraftChange = (next: Draft) => {
-    if (next.date !== draft.date) setSelectedDate(next.date);
-    setDraft(next);
-  };
+  // 드래프트 변경
+  const handleDraftChange = useCallback(
+    (next: Draft) => {
+      if (next.date !== draft.date) setSelectedDate(next.date);
+      setDraft(next);
+    },
+    [draft.date],
+  );
 
-  const submitDraft = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSaving(true);
-    setMessage("");
-    const res = await fetch("/api/schedule", {
-      method: draft.id ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(draft),
+  // 슬롯 등록/수정 제출
+  const submitDraft = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setSaving(true);
+      setMessage("");
+      const res = await fetch("/api/schedule", {
+        method: draft.id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draft),
+      });
+      setSaving(false);
+      if (!res.ok) {
+        setMessage("저장 실패: 로그인 상태나 입력값을 확인해주세요.");
+        return;
+      }
+      setItems((await res.json()) as ScheduleItem[]);
+      setDraft(makeDraft(selectedDate));
+      setMessage(draft.id ? "수정 완료" : "등록 완료");
+    },
+    [draft, selectedDate],
+  );
+
+  // 슬롯 삭제
+  const handleDelete = useCallback(
+    async (id: string) => {
+      const res = await fetch("/api/schedule", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) {
+        setMessage("삭제 실패: 관리자 로그인 상태를 확인해주세요.");
+        return;
+      }
+      setItems((await res.json()) as ScheduleItem[]);
+      if (draft.id === id) {
+        setDraft(makeDraft(selectedDate));
+      }
+      setMessage("삭제 완료");
+    },
+    [draft.id, selectedDate],
+  );
+
+  // 슬롯 편집 시작
+  const handleEdit = useCallback((item: ScheduleItem) => {
+    setDraft({
+      id: item.id,
+      date: item.date,
+      time: item.time,
+      guestName: item.guestName,
+      status: item.status,
+      note: item.note ?? "",
     });
-    setSaving(false);
-    if (!res.ok) {
-      setMessage("저장 실패: 로그인 상태나 입력값을 확인해주세요.");
-      return;
-    }
-    setItems((await res.json()) as ScheduleItem[]);
+  }, []);
+
+  // 폼 초기화
+  const handleReset = useCallback(() => {
     setDraft(makeDraft(selectedDate));
-    setMessage(draft.id ? "수정 완료" : "등록 완료");
-  };
-
-  const handleDelete = async (id: string) => {
-    const res = await fetch("/api/schedule", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    if (!res.ok) {
-      setMessage("삭제 실패: 관리자 로그인 상태를 확인해주세요.");
-      return;
-    }
-    setItems((await res.json()) as ScheduleItem[]);
-    if (draft.id === id) setDraft(makeDraft(selectedDate));
-    setMessage("삭제 완료");
-  };
+  }, [selectedDate]);
 
   if (loading) {
     return (
@@ -143,11 +192,13 @@ const AdminPage = () => {
             saving={saving}
             onChange={handleDraftChange}
             onSubmit={submitDraft}
-            onReset={() => setDraft(makeDraft(selectedDate))}
+            onReset={handleReset}
           />
           <button
             onClick={handleLogout}
             className="w-full rounded-md border border-zinc-500 bg-zinc-100 px-3 py-2 text-sm"
+            type="button"
+            aria-label="로그아웃"
           >
             로그아웃
           </button>
@@ -182,17 +233,8 @@ const AdminPage = () => {
             <SlotCard
               key={item.id}
               item={item}
-              onEdit={(it) =>
-                setDraft({
-                  id: it.id,
-                  date: it.date,
-                  time: it.time,
-                  guestName: it.guestName,
-                  status: it.status,
-                  note: it.note ?? "",
-                })
-              }
-              onDelete={(id) => void handleDelete(id)}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
             />
           ))
         )}

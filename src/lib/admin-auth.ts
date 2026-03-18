@@ -2,27 +2,44 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 
 const COOKIE_NAME = "yoonseul_admin_session";
-const SESSION_TTL_SEC = 60 * 60 * 12;
+const SESSION_TTL_SEC = 60 * 60 * 12; // 12 hours
 
-const getSecret = () =>
+/**
+ * 세션 서명용 비밀키 조회
+ */
+const getSecret = (): string =>
   process.env.ADMIN_SESSION_SECRET ?? "dev-secret-change-me";
 
-const toBase64Url = (value: string) => Buffer.from(value).toString("base64url");
+/**
+ * 문자열을 Base64URL로 인코딩
+ */
+const toBase64Url = (value: string): string =>
+  Buffer.from(value).toString("base64url");
 
-const sign = (payload: string) =>
+/**
+ * 페이로드에 대해 HMAC-SHA256 서명 생성
+ */
+const sign = (payload: string): string =>
   createHmac("sha256", getSecret()).update(payload).digest("base64url");
 
-const parseToken = (token: string) => {
+/**
+ * JWT 토큰 파싱 및 검증
+ */
+const parseToken = (token: string): { exp: number; role: "admin" } | null => {
   const [encodedPayload, signature] = token.split(".");
   if (!encodedPayload || !signature) {
     return null;
   }
 
   const expectedSignature = sign(encodedPayload);
-  const a = Buffer.from(signature);
-  const b = Buffer.from(expectedSignature);
+  const signatureBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expectedSignature);
 
-  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+  // 타이밍 안전 비교로 timing attack 방지
+  if (
+    signatureBuffer.length !== expectedBuffer.length ||
+    !timingSafeEqual(signatureBuffer, expectedBuffer)
+  ) {
     return null;
   }
 
@@ -34,6 +51,7 @@ const parseToken = (token: string) => {
       role: "admin";
     };
 
+    // 만료 시간 확인
     if (
       payload.role !== "admin" ||
       payload.exp < Math.floor(Date.now() / 1000)
@@ -47,7 +65,10 @@ const parseToken = (token: string) => {
   }
 };
 
-export const verifyAdminPassword = (password: string) => {
+/**
+ * 관리자 비밀번호 검증
+ */
+export const verifyAdminPassword = (password: string): boolean => {
   const configured = process.env.ADMIN_PASSWORD;
   if (!configured) {
     return password === "admin1234";
@@ -55,7 +76,10 @@ export const verifyAdminPassword = (password: string) => {
   return password === configured;
 };
 
-export const createSessionToken = () => {
+/**
+ * 새로운 세션 토큰 생성
+ */
+export const createSessionToken = (): string => {
   const payload = {
     role: "admin" as const,
     exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SEC,
@@ -65,7 +89,13 @@ export const createSessionToken = () => {
   return `${encodedPayload}.${sign(encodedPayload)}`;
 };
 
-export const getAdminSession = async () => {
+/**
+ * 현재 관리자 세션 조회
+ */
+export const getAdminSession = async (): Promise<{
+  exp: number;
+  role: "admin";
+} | null> => {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) {
@@ -74,6 +104,9 @@ export const getAdminSession = async () => {
   return parseToken(token);
 };
 
+/**
+ * 세션 쿠키 옵션
+ */
 export const sessionCookieOptions = {
   name: COOKIE_NAME,
   maxAge: SESSION_TTL_SEC,
@@ -81,4 +114,4 @@ export const sessionCookieOptions = {
   sameSite: "lax" as const,
   secure: process.env.NODE_ENV === "production",
   path: "/",
-};
+} as const;

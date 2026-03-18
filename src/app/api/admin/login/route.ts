@@ -6,6 +6,7 @@ import {
   sessionCookieOptions,
   verifyAdminPassword,
 } from "@/lib/admin-auth";
+import { jsonError } from "@/lib/api-helpers";
 
 export const GET = async () => {
   const session = await getAdminSession();
@@ -16,10 +17,7 @@ export const POST = async (request: Request) => {
   const body = (await request.json()) as { password?: string };
 
   if (!body.password || !verifyAdminPassword(body.password)) {
-    return NextResponse.json(
-      { message: "비밀번호가 올바르지 않습니다." },
-      { status: 401 },
-    );
+    return jsonError("비밀번호가 올바르지 않습니다.", 401);
   }
 
   const token = createSessionToken();

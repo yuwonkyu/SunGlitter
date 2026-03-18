@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { groupItemsByDate } from "@/lib/calendar";
 import type { ScheduleItem } from "@/types/schedule";
 import PageShell from "@/components/ui/PageShell";
@@ -12,18 +12,23 @@ const SchedulePage = () => {
   const [items, setItems] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // 초기 데이터 로드
   useEffect(() => {
     const fetchItems = async () => {
       try {
         const res = await fetch("/api/schedule", { cache: "no-store" });
         if (res.ok) setItems((await res.json()) as ScheduleItem[]);
+      } catch (error) {
+        console.error("Failed to fetch schedule items:", error);
       } finally {
         setLoading(false);
       }
     };
+
     void fetchItems();
   }, []);
 
+  // 날짜별 그룹화
   const grouped = useMemo(() => groupItemsByDate(items), [items]);
 
   return (

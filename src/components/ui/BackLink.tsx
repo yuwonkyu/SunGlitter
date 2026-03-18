@@ -13,14 +13,12 @@ const BackLink = ({
   href = "/",
   label = "홈으로 돌아가기",
   className = "",
-}: BackLinkProps) => {
-  return (
-    <div className={`text-center text-sm ${className}`}>
-      <Link href={href} className="underline underline-offset-4 text-zinc-700">
-        {label}
-      </Link>
-    </div>
-  );
-};
+}: BackLinkProps) => (
+  <div className={`text-center text-sm ${className}`}>
+    <Link href={href} className="underline underline-offset-4 text-zinc-700">
+      {label}
+    </Link>
+  </div>
+);
 
 export default BackLink;

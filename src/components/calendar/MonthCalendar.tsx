@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import {
   createMonthGrid,
   statusTone,
@@ -17,21 +17,81 @@ interface MonthCalendarProps {
 }
 
 /**
+ * 날짜 셀 컴포넌트
+ */
+const DateCell = memo(
+  ({
+    date,
+    isCurrentMonth,
+    isToday,
+    dayItems,
+  }: {
+    date: Date;
+    isCurrentMonth: boolean;
+    isToday: boolean;
+    dayItems: ScheduleItem[];
+  }) => {
+    const day = date.getDay();
+    const dayColorClass = isToday
+      ? "bg-zinc-900 text-white"
+      : day === 0
+        ? "text-red-500"
+        : day === 6
+          ? "text-blue-500"
+          : "text-zinc-700";
+
+    return (
+      <div
+        className={`min-h-15 bg-zinc-50 p-1 ${!isCurrentMonth ? "opacity-30" : ""}`}
+      >
+        <span
+          className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-medium ${dayColorClass}`}
+        >
+          {date.getDate()}
+        </span>
+        <div className="mt-0.5 space-y-0.5">
+          {dayItems.map((item) => (
+            <div
+              key={item.id}
+              className={`rounded border px-1 py-0.5 text-[10px] leading-tight ${statusTone[item.status]}`}
+            >
+              <div>{item.time}</div>
+              <div className="truncate opacity-80">
+                {maskName(item.guestName)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  },
+);
+
+DateCell.displayName = "DateCell";
+
+/**
  * 월별 달력 그리드. 각 날짜 셀에 예약 슬롯(시간 + 마스킹된 이름)을 표시합니다.
  */
-const MonthCalendar = ({ grouped }: MonthCalendarProps) => {
+const MonthCalendar = memo(({ grouped }: MonthCalendarProps) => {
   const [viewMonth, setViewMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
 
   const grid = useMemo(() => createMonthGrid(viewMonth), [viewMonth]);
-  const todayKey = useMemo(() => toDateKey(new Date()), []);
+  const todayKey = useMemo(
+    () => toDateKey(new Date()),
+    [], // 의도적으로 deps를 비워서 마운트 시점의 오늘 날짜로 고정
+  );
 
-  const prevMonth = () =>
-    setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
-  const nextMonth = () =>
-    setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
+  const prevMonth = useCallback(
+    () => setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1)),
+    [],
+  );
+  const nextMonth = useCallback(
+    () => setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1)),
+    [],
+  );
 
   return (
     <section className="rounded-2xl border border-zinc-300 bg-zinc-50 p-4 shadow-[0_8px_24px_rgba(0,0,0,0.05)]">
@@ -72,41 +132,13 @@ const MonthCalendar = ({ grouped }: MonthCalendarProps) => {
           const dayItems = grouped[key] ?? [];
           const isToday = key === todayKey;
           return (
-            <div
+            <DateCell
               key={key}
-              className={`min-h-15 bg-zinc-50 p-1 ${!isCurrentMonth ? "opacity-30" : ""}`}
-            >
-              {(() => {
-                const day = date.getDay();
-                let colorClass = "text-zinc-700";
-                if (!isToday) {
-                  if (day === 0) colorClass = "text-red-500"; // 일요일
-                  else if (day === 6) colorClass = "text-blue-500"; // 토요일
-                }
-                return (
-                  <span
-                    className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-medium ${
-                      isToday ? "bg-zinc-900 text-white" : colorClass
-                    }`}
-                  >
-                    {date.getDate()}
-                  </span>
-                );
-              })()}
-              <div className="mt-0.5 space-y-0.5">
-                {dayItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`rounded border px-1 py-0.5 text-[10px] leading-tight ${statusTone[item.status]}`}
-                  >
-                    <div>{item.time}</div>
-                    <div className="truncate opacity-80">
-                      {maskName(item.guestName)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+              date={date}
+              isCurrentMonth={isCurrentMonth}
+              isToday={isToday}
+              dayItems={dayItems}
+            />
           );
         })}
       </div>
@@ -125,6 +157,8 @@ const MonthCalendar = ({ grouped }: MonthCalendarProps) => {
       </div>
     </section>
   );
-};
+});
+
+MonthCalendar.displayName = "MonthCalendar";
 
 export default MonthCalendar;
