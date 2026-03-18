@@ -32,14 +32,18 @@ interface SlotFormProps {
 const SlotForm = memo(
   ({ draft, saving, onChange, onSubmit, onReset }: SlotFormProps) => {
     const [hour = "00", minute = "00"] = draft.time.split(":");
+    const isEditMode = Boolean(draft.id);
+    const formClassName = isEditMode
+      ? "space-y-3 rounded-xl border border-amber-400 bg-amber-50 p-4"
+      : "space-y-3 rounded-xl border border-emerald-400 bg-emerald-50 p-4";
+    const submitClassName = isEditMode
+      ? "rounded-md bg-amber-700 px-3 py-2 text-sm text-white disabled:opacity-60"
+      : "rounded-md bg-emerald-700 px-3 py-2 text-sm text-white disabled:opacity-60";
 
     return (
-      <form
-        onSubmit={onSubmit}
-        className="space-y-3 rounded-xl border border-zinc-300 bg-zinc-50 p-4"
-      >
-        <p className="text-sm font-semibold">
-          {draft.id ? "예약 슬롯 수정" : "예약 슬롯 등록"}
+      <form onSubmit={onSubmit} className={formClassName}>
+        <p className="text-sm font-semibold text-zinc-900">
+          {isEditMode ? "예약 슬롯 수정" : "예약 슬롯 등록"}
         </p>
 
         <input
@@ -117,11 +121,7 @@ const SlotForm = memo(
         />
 
         <div className="grid grid-cols-2 gap-2">
-          <button
-            disabled={saving}
-            type="submit"
-            className="rounded-md bg-zinc-900 px-3 py-2 text-sm text-white disabled:opacity-60"
-          >
+          <button disabled={saving} type="submit" className={submitClassName}>
             {saving ? "저장 중..." : draft.id ? "수정 저장" : "신규 등록"}
           </button>
           <button

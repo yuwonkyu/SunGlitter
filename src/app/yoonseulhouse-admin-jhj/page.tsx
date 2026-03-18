@@ -29,9 +29,32 @@ const AdminPage = () => {
   const [draft, setDraft] = useState<Draft>(() =>
     makeDraft(toDateKey(new Date())),
   );
-  const [message, setMessage] = useState("");
+  const [toast, setToast] = useState<{
+    text: string;
+    tone: "success" | "error";
+  } | null>(null);
   const [saving, setSaving] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() => toDateKey(new Date()));
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
+  const showToast = useCallback(
+    (text: string, tone: "success" | "error" = "success") => {
+      setToast({ text, tone });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!toast) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   // 데이터 로드
   const loadData = useCallback(async () => {
@@ -78,14 +101,14 @@ const AdminPage = () => {
         body: JSON.stringify({ password }),
       });
       if (!res.ok) {
-        setMessage("로그인에 실패했습니다.");
+        showToast("로그인에 실패했습니다.", "error");
         return;
       }
       setAuthenticated(true);
       setPassword("");
-      setMessage("로그인 되었습니다.");
+      showToast("로그인 되었습니다.");
     },
-    [password],
+    [password, showToast],
   );
 
   // 로그아웃
@@ -93,8 +116,8 @@ const AdminPage = () => {
     await fetch("/api/admin/logout", { method: "POST" });
     setAuthenticated(false);
     setDraft(makeDraft(selectedDate));
-    setMessage("로그아웃 되었습니다.");
-  }, [selectedDate]);
+    showToast("로그아웃 되었습니다.");
+  }, [selectedDate, showToast]);
 
   // 드래프트 변경
   const handleDraftChange = useCallback(
@@ -110,7 +133,6 @@ const AdminPage = () => {
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       setSaving(true);
-      setMessage("");
       const res = await fetch("/api/schedule", {
         method: draft.id ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -118,18 +140,18 @@ const AdminPage = () => {
       });
       setSaving(false);
       if (!res.ok) {
-        setMessage("저장 실패: 로그인 상태나 입력값을 확인해주세요.");
+        showToast("저장 실패: 로그인 상태나 입력값을 확인해주세요.", "error");
         return;
       }
       setItems((await res.json()) as ScheduleItem[]);
       setDraft(makeDraft(selectedDate));
-      setMessage(draft.id ? "수정 완료" : "등록 완료");
+      showToast(draft.id ? "수정 완료" : "등록 완료");
     },
-    [draft, selectedDate],
+    [draft, selectedDate, showToast],
   );
 
   // 슬롯 삭제
-  const handleDelete = useCallback(
+  const handleDeleteConfirm = useCallback(
     async (id: string) => {
       const res = await fetch("/api/schedule", {
         method: "DELETE",
@@ -137,17 +159,33 @@ const AdminPage = () => {
         body: JSON.stringify({ id }),
       });
       if (!res.ok) {
-        setMessage("삭제 실패: 관리자 로그인 상태를 확인해주세요.");
+        showToast("삭제 실패: 관리자 로그인 상태를 확인해주세요.", "error");
         return;
       }
       setItems((await res.json()) as ScheduleItem[]);
       if (draft.id === id) {
         setDraft(makeDraft(selectedDate));
       }
-      setMessage("삭제 완료");
+      showToast("삭제 완료");
     },
-    [draft.id, selectedDate],
+    [draft.id, selectedDate, showToast],
   );
+
+  const openDeleteConfirm = useCallback((id: string) => {
+    setDeleteTargetId(id);
+  }, []);
+
+  const closeDeleteConfirm = useCallback(() => {
+    setDeleteTargetId(null);
+  }, []);
+
+  const handleDelete = useCallback(async () => {
+    if (!deleteTargetId) {
+      return;
+    }
+    await handleDeleteConfirm(deleteTargetId);
+    setDeleteTargetId(null);
+  }, [deleteTargetId, handleDeleteConfirm]);
 
   // 슬롯 편집 시작
   const handleEdit = useCallback((item: ScheduleItem) => {
@@ -205,12 +243,6 @@ const AdminPage = () => {
         </>
       )}
 
-      {message ? (
-        <p className="rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
-          {message}
-        </p>
-      ) : null}
-
       <section className="space-y-3 rounded-xl border border-zinc-300 bg-zinc-50 p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -234,13 +266,58 @@ const AdminPage = () => {
               key={item.id}
               item={item}
               onEdit={handleEdit}
-              onDelete={handleDelete}
+              onDelete={openDeleteConfirm}
             />
           ))
         )}
       </section>
 
       <BackLink className="pt-3" />
+
+      {deleteTargetId ? (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/35 px-4">
+          <div className="w-full max-w-sm rounded-xl border border-zinc-300 bg-white p-4 shadow-xl">
+            <p className="text-sm font-semibold text-zinc-900">
+              이 슬롯을 삭제하시겠습니까?
+            </p>
+            <p className="mt-1 text-xs text-zinc-600">
+              삭제 후에는 되돌릴 수 없습니다.
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={closeDeleteConfirm}
+                className="rounded-md border border-zinc-400 px-3 py-2 text-sm text-zinc-700"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleDelete()}
+                className="rounded-md bg-red-600 px-3 py-2 text-sm text-white"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {toast ? (
+        <div className="fixed inset-x-0 bottom-5 z-50 flex justify-center px-4">
+          <div
+            className={`w-full max-w-sm rounded-lg border px-4 py-3 text-sm shadow-lg ${
+              toast.tone === "error"
+                ? "border-red-200 bg-red-50 text-red-700"
+                : "border-emerald-200 bg-emerald-50 text-emerald-700"
+            }`}
+            role="status"
+            aria-live="polite"
+          >
+            {toast.text}
+          </div>
+        </div>
+      ) : null}
     </PageShell>
   );
 };
