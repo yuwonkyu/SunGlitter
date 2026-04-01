@@ -9,7 +9,7 @@ const LogoutButton = ({ onClick }: LogoutButtonProps) => {
   return (
     <button
       onClick={onClick}
-      className="w-full rounded-md border border-zinc-500 bg-zinc-100 px-3 py-2 text-sm"
+      className="text-sm text-zinc-700 underline underline-offset-4 transition-transform hover:scale-110 focus-visible:scale-110 focus-visible:outline-none"
       type="button"
       aria-label="로그아웃"
     >

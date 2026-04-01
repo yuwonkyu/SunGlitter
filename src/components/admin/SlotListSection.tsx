@@ -21,7 +21,7 @@ const SlotListSection = ({
   const slotCountLabel = selectedDate ? selectedItems.length : "-";
 
   return (
-    <section className="space-y-3 rounded-xl border border-zinc-300 bg-zinc-50 p-4">
+    <section className="space-y-3 rounded-xl  p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold">

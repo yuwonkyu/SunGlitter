@@ -1,8 +1,5 @@
-import { memo, useEffect, useMemo, useState, type FormEvent } from "react";
-import { createMonthGrid, fromDateKey, toDateKey } from "@/lib/calendar";
+import { memo, type FormEvent } from "react";
 import type { ReservationStatus } from "@/types/schedule";
-import CalendarHeader from "@/components/calendar/CalendarHeader";
-import WeekdayHeader from "@/components/calendar/WeekdayHeader";
 import StatusSelect from "./StatusSelect";
 
 export type Draft = {
@@ -19,7 +16,6 @@ const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 interface SlotFormProps {
   draft: Draft;
   saving: boolean;
-  registeredDateCounts: Record<string, number>;
   onChange: (next: Draft) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onReset: () => void;
@@ -32,46 +28,19 @@ const SlotForm = memo(
   ({
     draft,
     saving,
-    registeredDateCounts,
     onChange,
     onSubmit,
     onReset,
   }: SlotFormProps) => {
     const [hour = "00", minute = "00"] = draft.time.split(":");
     const isEditMode = Boolean(draft.id);
-    const [viewMonth, setViewMonth] = useState(() => {
-      const selected = draft.date ? fromDateKey(draft.date) : null;
-      const source = selected ?? new Date();
-      return new Date(source.getFullYear(), source.getMonth(), 1);
-    });
-    const grid = useMemo(() => createMonthGrid(viewMonth), [viewMonth]);
-    const todayKey = useMemo(() => toDateKey(new Date()), []);
-
-    useEffect(() => {
-      if (!draft.date) {
-        return;
-      }
-      const selected = fromDateKey(draft.date);
-      if (!selected) {
-        return;
-      }
-      const nextViewMonth = new Date(selected.getFullYear(), selected.getMonth(), 1);
-      queueMicrotask(() => setViewMonth(nextViewMonth));
-    }, [draft.date]);
-
-    const prevMonth = () => {
-      setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
-    };
-    const nextMonth = () => {
-      setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
-    };
 
     const formClassName = isEditMode
-      ? "space-y-3 rounded-xl border border-amber-400 bg-amber-50 p-4"
-      : "space-y-3 rounded-xl border border-emerald-400 bg-emerald-50 p-4";
+      ? "w-full space-y-3 rounded-xl bg-black/5 p-4"
+      : "w-full space-y-3 rounded-xl bg-white p-4";
     const submitClassName = isEditMode
-      ? "rounded-md bg-amber-700 px-3 py-2 text-sm text-white disabled:opacity-60"
-      : "rounded-md bg-emerald-700 px-3 py-2 text-sm text-white disabled:opacity-60";
+      ? " bg-amber-700 px-3 py-2 text-sm text-white disabled:opacity-60 rounded-md"
+      : " bg-emerald-700 px-3 py-2 text-sm text-white disabled:opacity-60 rounded-md";
 
     return (
       <form onSubmit={onSubmit} className={formClassName}>
@@ -83,73 +52,13 @@ const SlotForm = memo(
           선택 날짜: {draft.date || "달력에서 날짜를 선택해주세요."}
         </p>
 
-        <div className="rounded-lg border border-zinc-300 bg-white p-3">
-          <CalendarHeader
-            viewMonth={viewMonth}
-            onPrevMonth={prevMonth}
-            onNextMonth={nextMonth}
-            buttonClassName="rounded-md border border-zinc-300 px-2 py-1 text-xs"
-            titleClassName="text-sm font-semibold text-zinc-800"
-          />
-
-          <WeekdayHeader
-            className="mb-1 grid grid-cols-7 text-center text-[11px] text-zinc-500"
-            labelClassName="py-1"
-          />
-
-          <div className="grid grid-cols-7 gap-1">
-            {grid.map(({ key, date, isCurrentMonth }) => {
-              const isSelected = draft.date === key;
-              const isToday = key === todayKey;
-              const reservationCount = registeredDateCounts[key] ?? 0;
-
-              const reservationToneClassName =
-                reservationCount >= 5
-                  ? "border-red-500/30 bg-red-200/50"
-                  : reservationCount >= 3
-                    ? "border-orange-500/30 bg-orange-200/50"
-                    : reservationCount >= 1
-                      ? "border-lime-500/30 bg-lime-300/45"
-                      : "bg-zinc-50";
-
-              const cellClassName = [
-                "h-9 rounded-md border text-xs transition",
-                isCurrentMonth
-                  ? "text-zinc-800"
-                  : "border-transparent text-zinc-400",
-                reservationToneClassName,
-                isSelected ? "ring-2 ring-emerald-500" : "",
-                isToday ? "font-semibold" : "",
-              ]
-                .filter(Boolean)
-                .join(" ");
-
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  className={cellClassName}
-                  onClick={() => onChange({ ...draft, date: key })}
-                  aria-label={`${key} 날짜 선택`}
-                >
-                  {date.getDate()}
-                </button>
-              );
-            })}
-          </div>
-
-          <p className="mt-2 text-[11px] text-zinc-600">
-            연두색: 1~2건, 연한 주황: 3~4건, 연한 빨강: 5건 이상
-          </p>
-        </div>
-
         <div className="grid grid-cols-2 gap-2">
           <select
             value={hour}
             onChange={(e) =>
               onChange({ ...draft, time: `${e.target.value}:${minute}` })
             }
-            className="cursor-pointer rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
+            className="cursor-pointer rounded-md  bg-white px-3 py-2 text-sm"
             aria-label="시간"
           >
             {HOURS.map((h) => (
@@ -163,7 +72,7 @@ const SlotForm = memo(
             onChange={(e) =>
               onChange({ ...draft, time: `${hour}:${e.target.value}` })
             }
-            className="cursor-pointer rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
+            className="cursor-pointer rounded-md  bg-white px-3 py-2 text-sm"
             aria-label="분"
           >
             <option value="00">00분</option>
@@ -178,7 +87,7 @@ const SlotForm = memo(
           type="text"
           value={draft.guestName}
           onChange={(e) => onChange({ ...draft, guestName: e.target.value })}
-          className="w-full rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
+          className="w-full rounded-md  bg-white px-3 py-2 text-sm"
           placeholder="예약자/이용 시간"
           required
           aria-label="예약자 이름"
@@ -192,19 +101,19 @@ const SlotForm = memo(
         <textarea
           value={draft.note}
           onChange={(e) => onChange({ ...draft, note: e.target.value })}
-          className="w-full rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
+          className="w-full resize-none rounded-md  bg-white px-3 py-2 text-sm"
           rows={3}
           placeholder="메모 (선택)"
           aria-label="메모"
         />
 
-        <div className="grid grid-cols-2 gap-2">
-          <button disabled={saving} type="submit" className={submitClassName}>
+        <div className="grid grid-cols-5 gap-2">
+          <button disabled={saving} type="submit" className={`${submitClassName} col-span-4`}>
             {saving ? "저장 중..." : draft.id ? "수정 저장" : "신규 등록"}
           </button>
           <button
             type="button"
-            className="rounded-md border border-zinc-500 px-3 py-2 text-sm"
+            className=" bg-red-800/80 rounded-md px-3 py-2 text-white text-sm col-span-1"
             onClick={onReset}
             aria-label="폼 초기화"
           >

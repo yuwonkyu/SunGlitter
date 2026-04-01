@@ -1,15 +1,21 @@
+import type { ReactNode } from "react";
+
 interface PageHeaderProps {
   title: string;
   description?: string;
+  actions?: ReactNode;
 }
 
 /**
  * 페이지 상단 헤더 카드.
  */
-const PageHeader = ({ title, description }: PageHeaderProps) => (
-  <header className="rounded-2xl border border-zinc-300 bg-zinc-50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
-    <h1 className="text-xl font-bold">{title}</h1>
-    {description && <p className="mt-2 text-sm text-zinc-600">{description}</p>}
+const PageHeader = ({ title, description, actions }: PageHeaderProps) => (
+  <header className="flex items-start justify-between gap-4 p-5">
+    <div>
+      <h1 className="text-xl font-bold">{title}</h1>
+      {description && <p className="mt-2 text-sm text-zinc-600">{description}</p>}
+    </div>
+    {actions && <div className="flex items-center gap-4 text-sm">{actions}</div>}
   </header>
 );
 
