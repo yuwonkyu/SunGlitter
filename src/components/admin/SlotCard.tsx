@@ -2,6 +2,22 @@ import { memo } from "react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import type { ScheduleItem } from "@/types/schedule";
 
+const formatUpdatedAt = (value: string) => {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "기록 없음";
+  }
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(parsed);
+};
+
 interface SlotCardProps {
   item: ScheduleItem;
   onEdit: (item: ScheduleItem) => void;
@@ -17,6 +33,9 @@ const SlotCard = memo(({ item, onEdit, onDelete }: SlotCardProps) => (
       <div>
         <p className="text-sm font-semibold">{item.time}</p>
         <p className="mt-1 text-sm text-zinc-700">{item.guestName}</p>
+        <p className="mt-1 text-xs text-zinc-500">
+          최종 작업: {formatUpdatedAt(item.updatedAt)}
+        </p>
       </div>
       <StatusBadge status={item.status} variant="full" />
     </div>

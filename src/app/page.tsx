@@ -13,11 +13,14 @@ export const metadata: Metadata = {
     description:
       "제주 월정리 윤슬이집 스튜디오 홈입니다. 예약 안내와 예약 현황을 확인하세요.",
     url: "/",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "윤슬이집 스튜디오" }],
   },
   twitter: {
+    card: "summary_large_image",
     title: "윤슬이집 스튜디오",
     description:
       "제주 월정리 윤슬이집 스튜디오 홈입니다. 예약 안내와 예약 현황을 확인하세요.",
+    images: ["/og-image.png"],
   },
 };
 

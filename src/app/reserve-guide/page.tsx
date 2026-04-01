@@ -13,11 +13,14 @@ export const metadata: Metadata = {
     description:
       "윤슬이집 스튜디오 예약 안내 페이지입니다. 위치, 주차, 결제, 장비 대여, DM 문의 양식을 확인하세요.",
     url: "/reserve-guide",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "윤슬이집 스튜디오" }],
   },
   twitter: {
+    card: "summary_large_image",
     title: "예약 안내 | 윤슬이집 스튜디오",
     description:
       "윤슬이집 스튜디오 예약 안내 페이지입니다. 위치, 주차, 결제, 장비 대여, DM 문의 양식을 확인하세요.",
+    images: ["/og-image.png"],
   },
 };
 
