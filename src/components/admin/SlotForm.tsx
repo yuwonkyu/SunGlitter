@@ -1,5 +1,6 @@
 import { memo, type FormEvent } from "react";
 import type { ReservationStatus } from "@/types/schedule";
+import StatusSelect from "./StatusSelect";
 
 export type Draft = {
   id?: string;
@@ -9,12 +10,6 @@ export type Draft = {
   status: ReservationStatus;
   note: string;
 };
-
-const STATUS_OPTIONS: { label: string; value: ReservationStatus }[] = [
-  { label: "예약 가능", value: "available" },
-  { label: "대기", value: "pending" },
-  { label: "예약 완료", value: "booked" },
-];
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 
@@ -96,20 +91,10 @@ const SlotForm = memo(
           aria-label="예약자 이름"
         />
 
-        <select
+        <StatusSelect
           value={draft.status}
-          onChange={(e) =>
-            onChange({ ...draft, status: e.target.value as ReservationStatus })
-          }
-          className="w-full rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
-          aria-label="예약 상태"
-        >
-          {STATUS_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          onChange={(status) => onChange({ ...draft, status })}
+        />
 
         <textarea
           value={draft.note}
