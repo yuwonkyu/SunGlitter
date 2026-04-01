@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export const proxy = (request: NextRequest) => {
+  const applyNoIndexHeader = (response: NextResponse) => {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+    return response;
+  };
+
   const basicAuth = request.headers.get("authorization");
 
   if (basicAuth) {
@@ -17,18 +22,18 @@ export const proxy = (request: NextRequest) => {
         const validPassword = process.env.GATE_PASSWORD;
 
         if (validPassword && user === validUser && password === validPassword) {
-          return NextResponse.next();
+          return applyNoIndexHeader(NextResponse.next());
         }
       }
     }
   }
 
-  return new NextResponse("인증이 필요합니다.", {
+  return applyNoIndexHeader(new NextResponse("인증이 필요합니다.", {
     status: 401,
     headers: {
       "WWW-Authenticate": 'Basic realm="Admin Area", charset="UTF-8"',
     },
-  });
+  }));
 };
 
 export const config = {

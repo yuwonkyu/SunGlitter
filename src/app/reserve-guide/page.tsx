@@ -1,6 +1,64 @@
 import type { Metadata } from "next";
 import BackLink from "@/components/ui/BackLink";
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "예약은 어떻게 확정되나요?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "DM 문의 후 계좌 입금이 확인되면 예약이 최종 확정됩니다.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "최소 이용 시간과 요금은 어떻게 되나요?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "최소 2시간부터 예약 가능하며, 시간당 50,000원 기준으로 운영됩니다.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "촬영 인원 제한이 있나요?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "기본 최대 4명까지 가능하며, 인원 추가 시 시간당 인당 10,000원이 추가됩니다.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "장비 대여가 가능한가요?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "조명, 삼각대, 스탠드, 렌즈 등은 사전 협의 후 대여 가능합니다.",
+      },
+    },
+  ],
+};
+
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "홈",
+      item: "https://sun-glitter.vercel.app",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "예약 안내",
+      item: "https://sun-glitter.vercel.app/reserve-guide",
+    },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "예약 안내",
   description:
@@ -28,6 +86,14 @@ const ReserveGuidePage = () => {
   return (
     <div className="paper-bg min-h-screen px-5 py-8">
       <main className="mx-auto w-full max-w-md">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        />
         <section className="fade-up rounded-2xl border border-(--line) bg-(--card) p-6 shadow-[0_8px_24px_rgba(0,0,0,0.07)]">
           <h1 className="mb-2 text-2xl font-bold">예약 안내</h1>
           <p className="mb-4 text-sm text-(--muted)">

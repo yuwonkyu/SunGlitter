@@ -15,6 +15,7 @@ const notoSansKr = Noto_Sans_KR({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
 
   title: {
     default: SITE_NAME,
@@ -44,7 +45,11 @@ export const metadata: Metadata = {
 
   alternates: {
     canonical: SITE_URL,
+    languages: {
+      "ko-KR": SITE_URL,
+    },
   },
+  manifest: "/manifest.webmanifest",
 
   openGraph: {
     type: "website",
@@ -69,6 +74,7 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: [`${SITE_URL}/og-image.png`],
   },
+  category: "photography",
 };
 
 const RootLayout = ({

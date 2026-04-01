@@ -41,6 +41,39 @@ const localBusinessJsonLd = {
   sameAs: ["https://www.instagram.com/yoonseul.house/"],
 };
 
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "윤슬이집 스튜디오",
+  url: "https://sun-glitter.vercel.app",
+  inLanguage: "ko-KR",
+};
+
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "홈",
+      item: "https://sun-glitter.vercel.app",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "예약 안내",
+      item: "https://sun-glitter.vercel.app/reserve-guide",
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: "예약 현황",
+      item: "https://sun-glitter.vercel.app/schedule",
+    },
+  ],
+};
+
 const LINKS: LinkItem[] = [
   {
     title: "예약 안내",
@@ -72,6 +105,14 @@ const Home = () => (
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <section className="fade-up rounded-2xl border border-(--line) bg-(--card) p-6 shadow-[0_8px_24px_rgba(0,0,0,0.07)]">
         <p className="text-xs tracking-[0.3em] text-(--muted)">
