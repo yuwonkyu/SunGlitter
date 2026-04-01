@@ -4,13 +4,13 @@ import { memo, useCallback, useMemo, useState } from "react";
 import {
   createMonthGrid,
   toDateKey,
-  weekdayLabels,
 } from "@/lib/calendar";
 import type { ScheduleItem } from "@/types/schedule";
 import DateCell from "./DateCell";
 import ItemPreviewModal from "./ItemPreviewModal";
 import CalendarLegend from "./CalendarLegend";
 import CalendarHeader from "./CalendarHeader";
+import WeekdayHeader from "./WeekdayHeader";
 
 interface MonthCalendarProps {
   /** groupItemsByDate() 로 만든 날짜별 슬롯 맵 */
@@ -57,16 +57,7 @@ const MonthCalendar = memo(({ grouped }: MonthCalendarProps) => {
       />
 
       {/* 요일 헤더 */}
-      <div className="mb-1 grid grid-cols-7 text-center">
-        {weekdayLabels.map((label) => (
-          <div
-            key={label}
-            className="py-1 text-[11px] font-medium text-zinc-500"
-          >
-            {label}
-          </div>
-        ))}
-      </div>
+      <WeekdayHeader />
 
       {/* 날짜 셀 그리드 */}
       <div className="grid grid-cols-7 gap-px bg-zinc-200">

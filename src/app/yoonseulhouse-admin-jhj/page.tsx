@@ -20,6 +20,7 @@ const AdminPage = () => {
     draft,
     saving,
     selectedDate,
+    registeredDates,
     selectedItems,
     deleteTargetId,
     toast,
@@ -58,6 +59,7 @@ const AdminPage = () => {
           <SlotForm
             draft={draft}
             saving={saving}
+            registeredDates={registeredDates}
             onChange={handleDraftChange}
             onSubmit={submitDraft}
             onReset={handleReset}

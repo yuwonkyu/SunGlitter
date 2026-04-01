@@ -36,7 +36,7 @@ const useAdminPageState = () => {
   } = useAdminAuth();
 
   useEffect(() => {
-    if (!selectedDate || hasLoadedItems) {
+    if (!authenticated || hasLoadedItems) {
       return;
     }
 
@@ -49,9 +49,10 @@ const useAdminPageState = () => {
     };
 
     void fetchOnce();
-  }, [selectedDate, hasLoadedItems, fetchScheduleItems]);
+  }, [authenticated, hasLoadedItems]);
 
   const grouped = useMemo(() => groupItemsByDate(items), [items]);
+  const registeredDates = useMemo(() => Object.keys(grouped), [grouped]);
   const selectedItems = useMemo(
     () => (selectedDate ? (grouped[selectedDate] ?? []) : []),
     [grouped, selectedDate],
@@ -89,6 +90,10 @@ const useAdminPageState = () => {
   const submitDraft = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      if (!draft.date) {
+        showToast("달력에서 날짜를 먼저 선택해주세요.", "error");
+        return;
+      }
       setSaving(true);
       const saved = await saveScheduleDraft(draft);
       setSaving(false);
@@ -162,6 +167,7 @@ const useAdminPageState = () => {
     draft,
     saving,
     selectedDate,
+    registeredDates,
     selectedItems,
     deleteTargetId,
     toast,

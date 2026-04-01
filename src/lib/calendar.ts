@@ -35,6 +35,17 @@ export const toDateKey = (date: Date): string => {
 };
 
 /**
+ * YYYY-MM-DD 형식 문자열을 Date로 변환
+ */
+export const fromDateKey = (dateKey: string): Date | null => {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  if (!year || !month || !day) {
+    return null;
+  }
+  return new Date(year, month - 1, day);
+};
+
+/**
  * Date를 "YYYY년 M월" 형식의 레이블로 변환
  */
 export const toMonthLabel = (date: Date): string => {
