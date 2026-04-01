@@ -19,7 +19,7 @@ const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 interface SlotFormProps {
   draft: Draft;
   saving: boolean;
-  registeredDates: string[];
+  registeredDateCounts: Record<string, number>;
   onChange: (next: Draft) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onReset: () => void;
@@ -32,7 +32,7 @@ const SlotForm = memo(
   ({
     draft,
     saving,
-    registeredDates,
+    registeredDateCounts,
     onChange,
     onSubmit,
     onReset,
@@ -46,10 +46,6 @@ const SlotForm = memo(
     });
     const grid = useMemo(() => createMonthGrid(viewMonth), [viewMonth]);
     const todayKey = useMemo(() => toDateKey(new Date()), []);
-    const registeredDateSet = useMemo(
-      () => new Set(registeredDates),
-      [registeredDates],
-    );
 
     useEffect(() => {
       if (!draft.date) {
@@ -94,9 +90,6 @@ const SlotForm = memo(
             onNextMonth={nextMonth}
             buttonClassName="rounded-md border border-zinc-300 px-2 py-1 text-xs"
             titleClassName="text-sm font-semibold text-zinc-800"
-            useArrowIcon={false}
-            prevText="이전"
-            nextText="다음"
           />
 
           <WeekdayHeader
@@ -108,16 +101,23 @@ const SlotForm = memo(
             {grid.map(({ key, date, isCurrentMonth }) => {
               const isSelected = draft.date === key;
               const isToday = key === todayKey;
-              const isRegistered = registeredDateSet.has(key);
+              const reservationCount = registeredDateCounts[key] ?? 0;
+
+              const reservationToneClassName =
+                reservationCount >= 5
+                  ? "border-red-500/30 bg-red-200/50"
+                  : reservationCount >= 3
+                    ? "border-orange-500/30 bg-orange-200/50"
+                    : reservationCount >= 1
+                      ? "border-lime-500/30 bg-lime-300/45"
+                      : "bg-zinc-50";
 
               const cellClassName = [
                 "h-9 rounded-md border text-xs transition",
                 isCurrentMonth
                   ? "text-zinc-800"
                   : "border-transparent text-zinc-400",
-                isRegistered
-                  ? "border-lime-500/30 bg-lime-300/45"
-                  : "bg-zinc-50",
+                reservationToneClassName,
                 isSelected ? "ring-2 ring-emerald-500" : "",
                 isToday ? "font-semibold" : "",
               ]
@@ -139,7 +139,7 @@ const SlotForm = memo(
           </div>
 
           <p className="mt-2 text-[11px] text-zinc-600">
-            연두색(반투명): 이미 예약 슬롯이 등록된 날짜
+            연두색: 1~2건, 연한 주황: 3~4건, 연한 빨강: 5건 이상
           </p>
         </div>
 
@@ -149,7 +149,7 @@ const SlotForm = memo(
             onChange={(e) =>
               onChange({ ...draft, time: `${e.target.value}:${minute}` })
             }
-            className="rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
+            className="cursor-pointer rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
             aria-label="시간"
           >
             {HOURS.map((h) => (
@@ -163,7 +163,7 @@ const SlotForm = memo(
             onChange={(e) =>
               onChange({ ...draft, time: `${hour}:${e.target.value}` })
             }
-            className="rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
+            className="cursor-pointer rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
             aria-label="분"
           >
             <option value="00">00분</option>
@@ -179,7 +179,7 @@ const SlotForm = memo(
           value={draft.guestName}
           onChange={(e) => onChange({ ...draft, guestName: e.target.value })}
           className="w-full rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
-          placeholder="예약자/타임슬롯 이름"
+          placeholder="예약자/이용 시간"
           required
           aria-label="예약자 이름"
         />

@@ -52,7 +52,13 @@ const useAdminPageState = () => {
   }, [authenticated, hasLoadedItems]);
 
   const grouped = useMemo(() => groupItemsByDate(items), [items]);
-  const registeredDates = useMemo(() => Object.keys(grouped), [grouped]);
+  const registeredDateCounts = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(grouped).map(([date, dateItems]) => [date, dateItems.length]),
+      ),
+    [grouped],
+  );
   const selectedItems = useMemo(
     () => (selectedDate ? (grouped[selectedDate] ?? []) : []),
     [grouped, selectedDate],
@@ -167,7 +173,7 @@ const useAdminPageState = () => {
     draft,
     saving,
     selectedDate,
-    registeredDates,
+    registeredDateCounts,
     selectedItems,
     deleteTargetId,
     toast,

@@ -20,7 +20,7 @@ const StatusSelect = memo(({ value, onChange }: StatusSelectProps) => {
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as ReservationStatus)}
-      className="w-full rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
+      className="w-full cursor-pointer rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm"
       aria-label="예약 상태"
     >
       {STATUS_OPTIONS.map((opt) => (
