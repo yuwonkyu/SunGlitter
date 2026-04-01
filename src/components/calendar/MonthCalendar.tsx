@@ -25,11 +25,13 @@ const DateCell = memo(
     isCurrentMonth,
     isToday,
     dayItems,
+    onPreview,
   }: {
     date: Date;
     isCurrentMonth: boolean;
     isToday: boolean;
     dayItems: ScheduleItem[];
+    onPreview: (item: ScheduleItem) => void;
   }) => {
     const day = date.getDay();
     const dayColorClass = isToday
@@ -53,7 +55,17 @@ const DateCell = memo(
           {dayItems.map((item) => (
             <div
               key={item.id}
-              className={`rounded border px-1 py-0.5 text-[10px] leading-tight ${statusTone[item.status]}`}
+              onClick={() => onPreview(item)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onPreview(item);
+                }
+              }}
+              aria-label={`${maskName(item.guestName)} 예약 내역 미리보기`}
+              className={`cursor-pointer rounded border px-1 py-0.5 text-[10px] leading-tight ${statusTone[item.status]}`}
             >
               <div>{item.time}</div>
               <div className="truncate opacity-80">
@@ -77,6 +89,7 @@ const MonthCalendar = memo(({ grouped }: MonthCalendarProps) => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
+  const [previewItem, setPreviewItem] = useState<ScheduleItem | null>(null);
 
   const grid = useMemo(() => createMonthGrid(viewMonth), [viewMonth]);
   const todayKey = useMemo(
@@ -92,6 +105,12 @@ const MonthCalendar = memo(({ grouped }: MonthCalendarProps) => {
     () => setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1)),
     [],
   );
+  const openPreview = useCallback((item: ScheduleItem) => {
+    setPreviewItem(item);
+  }, []);
+  const closePreview = useCallback(() => {
+    setPreviewItem(null);
+  }, []);
 
   return (
     <section className="rounded-2xl border border-zinc-300 bg-zinc-50 p-4 shadow-[0_8px_24px_rgba(0,0,0,0.05)]">
@@ -138,6 +157,7 @@ const MonthCalendar = memo(({ grouped }: MonthCalendarProps) => {
               isCurrentMonth={isCurrentMonth}
               isToday={isToday}
               dayItems={dayItems}
+              onPreview={openPreview}
             />
           );
         })}
@@ -155,6 +175,46 @@ const MonthCalendar = memo(({ grouped }: MonthCalendarProps) => {
           예약 완료
         </span>
       </div>
+
+      {previewItem ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4"
+          onClick={closePreview}
+          role="dialog"
+          aria-modal="true"
+          aria-label="예약 내역 미리보기"
+        >
+          <div
+            className="w-full max-w-xs rounded-xl border border-zinc-300 bg-white p-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-3 flex items-start justify-between">
+              <h3 className="text-sm font-semibold text-zinc-900">예약 내역</h3>
+              <button
+                type="button"
+                onClick={closePreview}
+                className="rounded px-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
+                aria-label="닫기"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-2 text-sm">
+              <p>
+                <span className="mr-2 text-zinc-500">예약자</span>
+                <span className="font-medium text-zinc-900">
+                  {maskName(previewItem.guestName)}
+                </span>
+              </p>
+              <p>
+                <span className="mr-2 text-zinc-500">예약시간</span>
+                <span className="font-medium text-zinc-900">{previewItem.time}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 });
